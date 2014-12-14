@@ -1,7 +1,7 @@
-EBelasticNetNE.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
+EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 {
 
-	cat("EBLASSO Logistic Model, NE prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	cat("EBEN Logistic Model, NE prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
 	#set.seed(proc.time())
@@ -36,14 +36,14 @@ EBelasticNetNE.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 
 
 	step 				= 1;
-	Alpha 				= seq(from = 1, to = 0.05, by = -0.05)
+	Alpha 				= seq(from = 1, to = 0.1, by = -0.1)
 	nAlpha 				= length(Alpha);
 		
 	Likelihood 			= mat.or.vec((N_step*nAlpha),4);
 	logL 				= mat.or.vec(nFolds,1);
 	for(i_alpha in 1:nAlpha){
 		alpha 			= Alpha[i_alpha];
-		cat("Testing alpha", i_alpha, "/20:\t\talpha: ",alpha,"\n")
+		cat("Testing alpha", i_alpha, "/",nAlpha,":\t\talpha: ",alpha,"\n")
 		for (i_s in 1:N_step){
 			
 			lambda 		= Lambda[i_s];
@@ -56,7 +56,7 @@ EBelasticNetNE.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 				index  			= which(foldId == i);
 				Basis.Test  	= BASIS[index,];
 				Target.Test 	= Target[index];
-				SimF2fEB 		<-EBelasticNetNE.Binomial(Basis.Train,Target.Train,lambda,alpha,Epis);
+				SimF2fEB 		<-EBelasticNet.Binomial(Basis.Train,Target.Train,lambda,alpha,Epis);
 				M				= length(SimF2fEB$weight)/6;
 				Betas 			<- matrix(SimF2fEB$weight,nrow= M,ncol =6, byrow= FALSE);
 				Mu  			= Betas[,3];
@@ -84,6 +84,6 @@ EBelasticNetNE.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 	Res.lambda			= Likelihood[index,2];
 	Res.alpha 			= Likelihood[index,1];
 	result 				<- list(Likelihood,Res.alpha,Res.lambda);
-	names(result)		<-c("CrossValidation","Alpha_optimal","Lmabda_optimal");
+	names(result)		<-c("CrossValidation","Alpha_optimal","Lambda_optimal");
 	return(result);
 }

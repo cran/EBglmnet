@@ -1,8 +1,8 @@
-EBelasticNet.GaussianCV <-
-function(BASIS,Target,nFolds,Epis="no",foldId = 0)
+EBlassoNE.GaussianCV <-
+function(BASIS,Target,nFolds,nStep= 20,Epis="no",foldId = 0)
 {
 	#early stop: for each alpha, if next lambda > SSEmin, then stop.
-	cat("EB-Elastic Net Linear Model, Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	cat("EBlasso-NE Linear Model, Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
 	#set.seed(proc.time())
@@ -33,24 +33,21 @@ function(BASIS,Target,nFolds,Epis="no",foldId = 0)
 	}
 	lambda_Max 			= lambda_Max;
 	lambda_Min 			= log(0.0001*lambda_Max);
-	step 				= (log(lambda_Max) - lambda_Min)/20;
+	step 				= (log(lambda_Max) - lambda_Min)/nStep;
 	Lambda 				= exp(seq(from = log(lambda_Max),to=lambda_Min,by= -step))
 	N_step 				= length(Lambda);
 
 	step 				= 1;
-	Alpha 				= seq(from = 1, to = 0.1, by = -0.1)
-	nAlpha 				= length(Alpha);
-		
+	nAlpha 				= 1;
+	alpha 				= 1;	
 	MSEcv 				= mat.or.vec((N_step*nAlpha),4);
 	MSEeachAlpha		= mat.or.vec(nAlpha,4); # minimum MSE for each alpha
 	MeanSqErr 			= mat.or.vec(nFolds,1);
 	SSE1Alpha			= matrix(1e10,N_step,2);# temp matrix to keep MSE + std in each step
 	
-	for(i_alpha in 1:nAlpha){
-		alpha 					= Alpha[i_alpha];
-		SSE1Alpha				= matrix(1e10,N_step,2);# temp matrix to keep MSE + std in each step
 
-		cat("Testing alpha", i_alpha, "/",nAlpha,":\t\talpha: ",alpha,"\n")
+	SSE1Alpha				= matrix(1e10,N_step,2);# temp matrix to keep MSE + std in each step
+
 		for (i_s in 1:N_step){			
 			lambda 				= Lambda[i_s];
 			min_index 			= which.min(SSE1Alpha[1:(i_s -1),1]);
@@ -106,12 +103,12 @@ function(BASIS,Target,nFolds,Epis="no",foldId = 0)
 		}
 		index 					= which.min(SSE1Alpha[,1]);
 		lambda 					= Lambda[index];
-		MSEeachAlpha[i_alpha,] 	= c(alpha,lambda, SSE1Alpha[index,]);
-	}
-	index 						= which.min(MSEeachAlpha[,3]);
-	Res.lambda					= MSEeachAlpha[index,2];
-	Res.alpha 					= MSEeachAlpha[index,1];
-	result 						<- list(MSEeachAlpha,Res.alpha,Res.lambda,MSEcv);
-	names(result)				<-c("CrossValidation","Alpha_optimal","Lambda_optimal","fullCV");
+		MSEeachAlpha 	= c(alpha,lambda, SSE1Alpha[index,]);
+
+
+	Res.lambda					= MSEeachAlpha[2];
+	Res.alpha 					= MSEeachAlpha[1];
+	result 						<- list(SSE1Alpha,Res.lambda,MSEcv);
+	names(result)				<-c("CrossValidation","Lambda_optimal","fullCV");
 	return(result);
 }

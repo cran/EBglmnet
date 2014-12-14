@@ -4,7 +4,7 @@ EBlassoNEG.Binomial <-function(BASIS,Target,a_gamma,b_gamma,Epis = "no",verbose 
 	if (verbose>0)  cat("EBLASSO Logistic Model, NEG prior, Epis: ",Epis,"\n");
 	if(Epis == "yes"){
 		#N_effect 		= (K+1)*K/2;
-		N_effect 		= 500;
+		N_effect 		= 2*K;
 		Beta 			= rep(0,N_effect *4);
 
 		#dyn.load("fEBBinaryFull.dll")

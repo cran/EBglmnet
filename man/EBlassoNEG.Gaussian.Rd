@@ -20,11 +20,14 @@ EBlassoNEG.Gaussian(BASIS, Target, a_gamma, b_gamma, Epis, verbose, group)
   \item{verbose}{from 0 to 5; larger verbose displays more messages}
   \item{group}{0 or 1; 0: No group effect; 1 two-way interaction grouped. Only valid when Epis = 'yes' } 
 }
-\details{If Epis="yes", the program adds two-way interaction K*(K-1)/2 more columns to BASIS\cr
-		for memory efficient, the function pass n_effect to C. n_effect > n_true effects, which is \cr
-		a rough guess on how many variables will be selected by the function \cr
-		by providing a relative 'small' n_effect, the function will not allocate \cr
-		a large trunck of memory during computation.
+\details{If Epis="yes", the program adds two-way interaction K*(K-1)/2 more columns to BASIS;
+		for memory efficient, the function pass n_effect to C. n_effect > n_true effects, which is 
+		a rough guess on how many variables will be selected by the function.
+		by providing a relative 'small' n_effect, the function will not allocate
+		a large trunk of memory during computation. If you run into situations where the the model ran out of memory and needed to select
+		more variables than the guess, please feel free to contact with me regarding to modifying the memory allocations. \cr\cr
+		By default, only the diagonal elements of the posterior covariance matrix are provided in the output for t-test. In cases where the whole covariance 
+		matrix is interested, please also contact with me for technique support.
 		}
 \value{
 	\item{weight}{the none-zero regression coefficients: \cr 

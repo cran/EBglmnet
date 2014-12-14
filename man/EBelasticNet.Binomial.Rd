@@ -1,8 +1,9 @@
-\name{EBelasticNetNE.Binomial}
-\alias{EBelasticNetNE.Binomial}
+\name{EBelasticNet.Binomial}
+\alias{EBelasticNet.Binomial}
 \title{The Empirical Bayesian Elastic Net (EBEN) Algorithm for Binomial Model with Normal-Gamma(NG) Prior Distribution}
-\description{Generalized linear regression, normal-Gxponential (NG) hierarchical prior for regression coefficients}
-\usage{EBelasticNetNE.Binomial(BASIS, Target, lambda, alpha,Epis = "no",verbose = 0)}
+\description{Generalized linear regression, normal-Gamma (NG) hierarchical prior for regression coefficients \cr
+			Multinomial model is not available in current package}
+\usage{EBelasticNet.Binomial(BASIS, Target, lambda, alpha,Epis = "no",verbose = 0)}
 
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -13,7 +14,14 @@
   \item{Epis}{"yes" or "no" for including two-way interactions}
   \item{verbose}{0 or 1; 1: display message; 0 no message}
 }
-\details{If Epis="yes", the program adds two-way interaction of K*(K-1)/2 more columns to BASIS}
+\details{If Epis="yes", the program adds two-way interaction K*(K-1)/2 more columns to BASIS;
+		for memory efficient, the function pass n_effect to C. n_effect > n_true effects, which is 
+		a rough guess on how many variables will be selected by the function.
+		by providing a relative 'small' n_effect, the function will not allocate
+		a large trunk of memory during computation. If you run into situations where the the model ran out of memory and needed to select
+		more variables than the guess, please feel free to contact with me regarding to modifying the memory allocations.\cr\cr
+		By default, only the diagonal elements of the posterior covariance matrix are provided in the output for t-test. In cases where the whole covariance 
+		matrix is interested, please also contact with me for technique support.}
 \value{
 	\item{weight}{the none-zero regression coefficients: \cr 
 	col1,col2 are the indices of the bases(main if equal); \cr
@@ -43,5 +51,5 @@ n = 50;
 k = 100;
 BASIS = BASISbinomial[1:n,1:k];
 y  = yBinomial[1:n];
-output = EBelasticNetNE.Binomial(BASIS, y,lambda = 1,alpha = 0.5, Epis = "no")
+output = EBelasticNet.Binomial(BASIS, y,lambda = 1,alpha = 0.5, Epis = "no")
 }

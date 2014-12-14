@@ -1,8 +1,8 @@
-EBelasticNetNE.Binomial <-
+EBelasticNet.Binomial <-
 function(BASIS,Target,lambda,alpha,Epis = "no",verbose = 0){
 	N 				= nrow(BASIS);
 	K 				= ncol(BASIS);
-	if (verbose>0) 	cat("EBLASSO Logistic Model, NE prior,Epis: ",Epis,"\n");
+	if (verbose>0) 	cat("EBEN Logistic Model, Epis: ",Epis,"\n");
 	if(Epis == "yes"){
 		N_effect 		= (K+1)*K/2;
 		Beta 			= rep(0,N_effect *4);

@@ -2,7 +2,8 @@
 \alias{EBlassoNEG.Binomial}
 %- Also NEED an '\alias' for EACH other topic documented here.
 \title{The EBlasso Algorithm for Binomial Model with Normal-Exponential-Gamma (NEG) Prior Distribution}
-\description{Generalized linear regression, normal-exponential-gamma (NEG) hierarchical prior for regression coefficients}
+\description{Generalized linear regression, normal-exponential-gamma (NEG) hierarchical prior for regression coefficients\cr
+			Multinomial model is not available in current package}
 \usage{
 EBlassoNEG.Binomial(BASIS, Target, a_gamma, b_gamma, Epis,verbose,group)
 }
@@ -16,7 +17,14 @@ EBlassoNEG.Binomial(BASIS, Target, a_gamma, b_gamma, Epis,verbose,group)
   \item{verbose}{0 or 1; 1: display message; 0 no message}
   \item{group}{0 or 1; 0: No group effect; 1 two-way interaction grouped. Only valid when Epis = 'yes' }  
 }
-\details{If Epis="yes", the program adds two-way interaction K*(K-1)/2 more columns to BASIS}
+\details{If Epis="yes", the program adds two-way interaction K*(K-1)/2 more columns to BASIS;
+		for memory efficient, the function pass n_effect to C. n_effect > n_true effects, which is 
+		a rough guess on how many variables will be selected by the function.
+		by providing a relative 'small' n_effect, the function will not allocate
+		a large trunk of memory during computation. If you run into situations where the the model ran out of memory and needed to select
+		more variables than the guess, please feel free to contact with me regarding to modifying the memory allocations.\cr\cr
+		By default, only the diagonal elements of the posterior covariance matrix are provided in the output for t-test. In cases where the whole covariance 
+		matrix is interested, please also contact with me for technique support.}
 \value{
 	\item{weight}{the none-zero regression coefficients: \cr 
 	col1,col2 are the indices of the bases(main if equal); \cr
@@ -30,7 +38,7 @@ EBlassoNEG.Binomial(BASIS, Target, a_gamma, b_gamma, Epis,verbose,group)
 	\item{a_gamma}{the hyperparameter; same as input}
 	\item{b_gamma}{the hyperparameter; same as input}
 }
-\references{Huang, A., Xu, S., and Cai, X.(2012). Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping. BMC Genetics. Submitted}
+\references{Huang A, Xu S, Cai X. (2013). Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping. BMC genetics  14(1):5.}
 \author{Anhui Huang; Dept of Electrical and Computer Engineering, Univ of Miami, Coral Gables, FL}
 
 
