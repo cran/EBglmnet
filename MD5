@@ -1,4 +1,4 @@
-20ffa66c56be626c158412ce98260efd *DESCRIPTION
+1651d07711d3aa4cebb31c87c4df71c1 *DESCRIPTION
 7256e6a6351fd2445f6e2f536317c9e4 *NAMESPACE
 51fa6a91a44b82ac37fd7c12c90f9179 *R/EBelasticNet.Binomial.R
 6b0decd7ad1786136ba41a2ddbf85255 *R/EBelasticNet.BinomialCV.R
@@ -21,7 +21,7 @@ bed147f63abfc8336fe9bbcf1601113b *data/yBinomial.rda
 959820dcc5fc3db08525e05d46722144 *man/EBelasticNet.BinomialCV.Rd
 5f435f2e3c48a5d0e33de973f5df8449 *man/EBelasticNet.Gaussian.Rd
 a0100da49f39f348d7276b7f96de5e17 *man/EBelasticNet.GaussianCV.Rd
-179a26c424e88181c35035e439f2d6b0 *man/EBglmnet-package.Rd
+5eabecbb4756115de6323e98a278c2be *man/EBglmnet-package.Rd
 f55bf221b41de9d87b3f9694374d228b *man/EBlassoNE.BinomialCV.Rd
 6a925be86c47cf39a459c31d9bdf5a3c *man/EBlassoNE.GaussianCV.Rd
 4990be51c5385b37157772cfd74f93f1 *man/EBlassoNEG.Binomial.Rd
@@ -30,8 +30,8 @@ f55bf221b41de9d87b3f9694374d228b *man/EBlassoNE.BinomialCV.Rd
 649e1d459cf7fdd19f40dbb942f80a76 *man/EBlassoNEG.GaussianCV.Rd
 34a9fe341eb220ee42d36febd71927af *man/y.Rd
 2337625cd1331946f312c399a3777a7e *man/yBinomial.Rd
-83a6c2447bb770fe64c062d9b3639c63 *src/ElasticNetBinaryNEmainEff.c
-5083d4f7b8b689328cbd4bdfed7da952 *src/ElasticNetBinaryNeFull.c
+bc906add9ce0ee4b581ee084fae36dd1 *src/ElasticNetBinaryNEmainEff.c
+bae76efd0810a5841760c366198000b8 *src/ElasticNetBinaryNeFull.c
 03cb2d11b8ddc5bd6b6f1f28edf771ee *src/Makevars
 7cf35c524a44eb46e697a9f0f3237507 *src/elasticNetLinearNeFull2.c
 5c072081bddf1896662c2ea8af535657 *src/elasticNetLinearNeMainEff.c

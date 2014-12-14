@@ -699,10 +699,10 @@ void LinearSolverBmNeEN(double * a, double *logout, int N, int M,double *output)
 	const double Rcond	= 1e-5;
 	int rank			= M;
 	int *jpvt;
-	jpvt				= (int * ) R_alloc(M,sizeof(int));
+	jpvt				= (int * ) Calloc(M,int);
 	const int lwork	= M*N + 4*N;
 	double * work;
-	work				= (double *) R_alloc(lwork,sizeof(double));
+	work				= (double *) Calloc(lwork,double);
 
 	int info			= 0;
 	// *************************Call LAPACK library ************************
@@ -712,11 +712,15 @@ void LinearSolverBmNeEN(double * a, double *logout, int N, int M,double *output)
 		Rprintf("Call linear solver degls error!\n");
 		return;
 	}
-	
 	//Rprintf("Matrix inversed!\n");	
-	int i;
+	//int i;
 	//output				= (double *) realloc(NULL,M*sizeof(double));
-	for (i=0;i<M;i++) output[i] = logout[i];	
+	//for (i=0;i<M;i++) output[i] = logout[i];	
+	int inci = 1;
+	int incj = 1;
+	F77_CALL(dcopy)(&M,logout,&inci,output,&incj);
+	Free(jpvt);
+	Free(work);
 }
 
  /// ***********************************************************************************************   

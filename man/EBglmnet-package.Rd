@@ -27,8 +27,8 @@
 \tabular{ll}{
 Package: \tab EBglmnet\cr
 Type: \tab Package\cr
-Version: \tab 3.5\cr
-Date: \tab 2014-12-12\cr
+Version: \tab 3.6\cr
+Date: \tab 2014-12-13\cr
 License: \tab gpl\cr
 }
 
