@@ -1,32 +1,35 @@
 EBlassoNE.GaussianCV <-
-function(BASIS,Target,nFolds,nStep= 20,Epis="no",foldId = 0)
-{
+function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0)
+{nStep= 19
 	#early stop: for each alpha, if next lambda > SSEmin, then stop.
 	cat("EBlasso-NE Linear Model, Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
 	#set.seed(proc.time())
-	if(length(foldId)!=N)
+	if (missing(foldId)) 
 	{
-	if(N%%nFolds!=0){
-		foldId 			= sample(c(rep(1:nFolds,floor(N/nFolds)),1:(N%%nFolds)),N);
-	}else{
-		foldId 			= sample(rep(1:nFolds,floor(N/nFolds)),N);
-	}
+		if(N%%nFolds!=0){
+			foldId 			= sample(c(rep(1:nFolds,floor(N/nFolds)),1:(N%%nFolds)),N);
+		}else{
+			foldId 			= sample(rep(1:nFolds,floor(N/nFolds)),N);
+		}
 	}
 	lambda_Max			= log(1.1);
+	ynorm 				= sqrt(sum(Target*Target));
+	ynormal 			= Target/ynorm;
+	
 	for(i_b in 1:K){
 		basis 			= BASIS[,i_b];
 		basis 			= basis/sqrt(sum(basis*basis));
-		corBy 			= basis%*%(Target-mean(Target));
+		corBy 			= basis%*%ynormal;
 		if(corBy>lambda_Max) lambda_Max = corBy;
 	}	
-	if(Epis == "yes"){
+	if(Epis){
 		for(i_b in 1:(K-1)){
 			for(i_bj in (i_b + 1):K){
 				basis 	= BASIS[,i_b]*BASIS[,i_bj];
 				basis 	= basis/sqrt(sum(basis*basis));
-				corBy 	= basis%*%(Target-mean(Target));
+				corBy 	= basis%*%ynormal;
 				if(corBy>lambda_Max) lambda_Max = corBy;
 			}
 		}		
@@ -48,11 +51,11 @@ function(BASIS,Target,nFolds,nStep= 20,Epis="no",foldId = 0)
 
 	SSE1Alpha				= matrix(1e10,N_step,2);# temp matrix to keep MSE + std in each step
 
-		for (i_s in 1:N_step){			
+	for (i_s in 1:N_step){			
 			lambda 				= Lambda[i_s];
 			min_index 			= which.min(SSE1Alpha[1:(i_s -1),1]);
 			previousL 			= SSE1Alpha[min_index,1] + SSE1Alpha[min_index,2];
-			#cat("\tTesting step", step, "\t\tlambda: ",lambda,"\t")
+			if(verbose >=0) cat("\tTesting step", step, "\t\tlambda: ",lambda,"\t")
 			
 			for(i in 1:nFolds){
 			#cat("Testing fold", j, "\n")
@@ -62,9 +65,9 @@ function(BASIS,Target,nFolds,nStep= 20,Epis="no",foldId = 0)
 				index  			= which(foldId == i);
 				Basis.Test  	= BASIS[index,];
 				Target.Test 	= Target[index];
-				SimF2fEB 		<-EBelasticNet.Gaussian(Basis.Train,Target.Train,lambda,alpha,Epis);
-				M				= length(SimF2fEB$weight)/6;
-				Betas 			<- matrix(SimF2fEB$weight,nrow= M,ncol =6, byrow= FALSE);
+				SimF2fEB 		<-EBelasticNet.Gaussian(Basis.Train,Target.Train,lambda,alpha,Epis,verbose);
+				M				= length(SimF2fEB$fit)/6;
+				Betas 			<- matrix(SimF2fEB$fit,nrow= M,ncol =6, byrow= FALSE);
 				Mu  			= Betas[,3];
 				Mu0 			= SimF2fEB$Intercept[1];
 				if(is.na(Mu0))
@@ -94,21 +97,23 @@ function(BASIS,Target,nFolds,nStep= 20,Epis="no",foldId = 0)
 			
 			
 			SSE1Alpha[i_s,] 	= c(mean(MeanSqErr),sd(MeanSqErr)/sqrt(nFolds));
-			#cat("sum squre error",mean(MeanSqErr),"\n");
+			if(verbose >=0) cat("sum squre error",mean(MeanSqErr),"\n");
 			MSEcv[step,]		= c(alpha, lambda,mean(MeanSqErr),sd(MeanSqErr)/sqrt(nFolds));
 			currentL			= MSEcv[step,3];
 			step 				= step + 1;
 			# break out of 2nd for loop
 			if((currentL - previousL)>0){break;}
-		}
-		index 					= which.min(SSE1Alpha[,1]);
-		lambda 					= Lambda[index];
-		MSEeachAlpha 	= c(alpha,lambda, SSE1Alpha[index,]);
-
+	}
+	index 						= which.min(SSE1Alpha[,1]);
+	lambda 						= Lambda[index];
+	MSEeachAlpha 				= c(alpha,lambda, SSE1Alpha[index,]);
+	
+	MSEcv = MSEcv[,1:3];
+	colnames(MSEcv) = c("lambda","Mean Square Error","standard error");
 
 	Res.lambda					= MSEeachAlpha[2];
 	Res.alpha 					= MSEeachAlpha[1];
-	result 						<- list(SSE1Alpha,Res.lambda,MSEcv);
-	names(result)				<-c("CrossValidation","Lambda_optimal","fullCV");
+	result 						<- list(MSEcv,Res.lambda);
+	names(result)				<-c("CrossValidation","optimal hyperparameter");
 	return(result);
 }

@@ -1,10 +1,10 @@
-EBlassoNEG.Binomial <-function(BASIS,Target,a_gamma,b_gamma,Epis = "no",verbose = 0,group = 1){
+EBlassoNEG.Binomial <-function(BASIS,Target,a_gamma,b_gamma,Epis = FALSE,verbose = 0,group = FALSE){
 	N 				= nrow(BASIS);
 	K 				= ncol(BASIS);
 	if (verbose>0)  cat("EBLASSO Logistic Model, NEG prior, Epis: ",Epis,"\n");
-	if(Epis == "yes"){
-		#N_effect 		= (K+1)*K/2;
-		N_effect 		= 2*K;
+	if(Epis){
+		N_effect 		= (K+1)*K/2;
+		#N_effect 		= 2*K;
 		Beta 			= rep(0,N_effect *4);
 
 		#dyn.load("fEBBinaryFull.dll")
@@ -54,35 +54,34 @@ EBlassoNEG.Binomial <-function(BASIS,Target,a_gamma,b_gamma,Epis = "no",verbose 
 	}else
 	{
 		nEff 	= length(ToKeep);
-		Blup 		= matrix(result[ToKeep,],nEff,4);
+		#Blup 		= matrix(result[ToKeep,],nEff,4);
+		Blup 		= result[ToKeep,,drop=FALSE];
 	}
-	if(Epis == "yes"){
-		blupMain 		= Blup[Blup[,1] ==Blup[,2],];
-		nMain 			= length(blupMain)/4;
-		blupMain 		= matrix(blupMain,nMain,4);
+	if(Epis){
+		blupMain 		= Blup[Blup[,1] ==Blup[,2],,drop = FALSE];
 		#
-		blupEpis 		= Blup[Blup[,1] !=Blup[,2],];
-		nEpis 			= length(blupEpis)/4;
-		blupEpis 		= matrix(blupEpis,nEpis,4);
-		
+		blupEpis 		= Blup[Blup[,1] !=Blup[,2],,drop = FALSE];
+	
 		order1 			= order(blupMain[,1]);
 		order2 			= order(blupEpis[,1]);
 		Blup 			= rbind(blupMain[order1,],blupEpis[order2,]);	
 	}
 	#t- test:
 	t 				= abs(Blup[,3])/(sqrt(Blup[,4])+ 1e-20);
-	pvalue 			= 1- pt(t,df=(N-1));
+pvalue 			= 2*(1- pt(t,df=(N-1)));
 	Blup 			= cbind(Blup,t,pvalue); 			#M x 6
+	colnames(Blup) = c("locus1","locus2","beta","posterior variance","t-value","p-value");	
 	#col1: index1
 	#col2: index2
 	#col3: beta
 	#col4: variance
 	#col5: t-value
 	#col6: p-value
-	
-	fEBresult 			<- list(Blup,output$logLikelihood,output$WaldScore,output$Intercept,a_gamma,b_gamma);
+	hyperparameters = c(a_gamma, b_gamma);
+	names(hyperparameters) = c("a", "b");
+	fEBresult 			<- list(Blup,output$logLikelihood,output$WaldScore,output$Intercept[1],hyperparameters);
 	rm(list= "output")	
-	names(fEBresult)		<-c("weight","logLikelihood","WaldScore","Intercept","a","b")
+	names(fEBresult)		<-c("fit","logLikelihood","WaldScore","Intercept","hyperparameters")
 	return(fEBresult)
 	
 }

@@ -1,0 +1,291 @@
+
+
+---
+output: pdf_document
+---
+
+<!-- 
+%\VignetteEngine{knitr::knitr} 
+%\VignetteIndexEntry{An Introduction to EBglmnet}
+--> 
+
+<a id="top"></a>
+
+# EBglmnet Vignette
+### Anhui Huang and Dianting Liu
+#### Nov. 30, 2015
+
+> [Introduction](#intro)
+
+> [Installation](#install)
+
+> [Quick Start](#qs)
+
+> [GLM Family](#glm)
+
+> [Prior, Hyperparameters and Epistasis](#prior)
+
+
+<a id="intro"></a>
+
+## Introduction 
+
+#### Acronyms to be used
+ 
+EBglmnet is a package that implemented the empirical Bayesian Lasso (EBlasso) and Elastic Net (EBEN) method for generalized linear models (GLMs). Additionally, in `EBlasso`, two different prior distributions are also developed: one with two-level hierarchical Normal + Exponential prior (denoted as `NE`), and the other one with three-level Normal + Exponential + gamma prior (denoted as `NEG`). The following names should not be confused with the `lasso` and `elastic net`  method in the comparison package `glmnet`:
+
+`EBglmnet`: package that implements `EBlasso` and `EBEN` methods.
+
+`EBlasso`: Empirical Bayesian method with `lasso` prior distribution, which includes two sets of prior distributions: `NE` and `NEG`.
+
+`EBEN`: Empirical Bayesian method with `elastic net` prior distribution.
+
+`lasso` prior: the hierarchical prior distribution that is equivalent with `lasso` penalty term when the marginal probability distribution for the regression coefficients is considered.
+
+`elastic net` prior: the hierarchical prior distribution that is equivalent with `elastic net` penalty term when the marginal probability distribution for the regression coefficients is considered.
+
+`EBlasso-NE`: `EBlasso` method having `NE` prior.
+
+`EBlasso-NEG`: `EBlasso` method having `NEG` prior.
+
+
+#### Generalized Linear Models (GLMs)
+In a GLM 
+
+$$
+ \boldsymbol{\eta}=\mu\mathit{\boldsymbol{I}}+\mathbf{X}\boldsymbol{\beta},
+$$
+where $\bf X$ is an $\it{n}\times\it{p}$ matrix containing $\it{p}$ variables for $\it{n}$ samples ($\it{p}$ can be $\gg \it{n}$). $\boldsymbol{\eta}$ is an $\it{n}\times 1$ linear predictor and is related to the response variable  $\mathit{\boldsymbol{y}}$ through a link function $\it{g}$: E($\mathit{\mathbf{y}} |\bf X$)=$\it{g}^{-1}$($\mu\mathit{\boldsymbol{I}} +\mathbf{X}\boldsymbol{\beta}$), and $\boldsymbol{\beta}$ is a $\it{p}\times 1$ vector of regression coefficients.
+Depending on certain assumption of the data distribution on $\mathit{\boldsymbol{y}}$, the GLM is generally inferred through finding the set of model parameters that maximize the model likelihood function  $\mathit{p}$($\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi$), where $\varphi$ denotes the other model parameter of the data distribution. However, such Maximum Likelihood (ML) approach is no longer applicable with $\it{p}\gg \it{n}$. With Bayesian Lasso and Bayesian elastic net (EN) prior distribution on $\boldsymbol{\beta}$, `EBglmnet` solves the problem by inferring a sparse posterior distribution for  $\hat{\boldsymbol{\beta}}$, which includes exactly zero regression coefficients for irrelevant variables and both posterior mean and variance for non-zero ones. Comparing to the `glmnet` package implementing Lasso and EN method, not only does `EBglmnet` provide features including both sparse outcome and hypothesis testing, simulation study and real data analysis in the reference papers also demonstrated the better performance in terms of Power of Detection, False Discovery Rate, as well as Power Detecting Group Effects when applicable. While mathematically details of the `EBlasso` and `EBEN` methods can be found in the reference papers, the principle of the methods and differences on the prior distributions will be briefly introduced here.
+
+
+### Lasso and its Bayesian Interpretation
+
+Lasso applies a penalty term on the log likelihood function and solve for $\hat{\boldsymbol{\beta}}$ by maximizing the following penalized likelihood :
+
+$$
+\hat{\boldsymbol{\beta}} = \arg_{\boldsymbol{\beta}}\max\left[\log\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi) -\lambda||\boldsymbol{\beta}||_1\right],
+$$
+
+The $\it{l_1}$ penalty term can be regarded as a mixture of hierarchical prior distribution:
+
+$$
+\beta_j  \sim \mathit{N}(0,\sigma_j^2),\\
+\sigma_j^2  \sim \exp(\lambda), j = 1, \dots, p,
+$$
+
+and maximizing the penalized likelihood function is equivalent to maximize the marginal posterior distribution of $\boldsymbol{\beta}$ :
+
+$$
+\hat{\boldsymbol{\beta}} = \arg_{\boldsymbol{\beta}}\max \log \mathit{p}(\boldsymbol{\beta}|\mathit{\boldsymbol{y}},\mathbf{X},\mu,\lambda, \varphi)\\
+\approx\arg_{\boldsymbol{\beta}}\max \log\int\left[\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)\cdot (2\pi)^{-p/2}\lvert\mathbf{A}\rvert^{1/2}\exp\{-\frac{1}{2}\boldsymbol{\beta}^T\mathbf{A}\boldsymbol{\beta}\}\cdot \prod^p_{j=1}\lambda\exp\{-\lambda\sigma_j^2\}\right]d\boldsymbol{\sigma}^2,
+$$
+
+where $\mathbf{A}$ is a diagonal matrix with $\boldsymbol{\sigma}^{-2}$ on its diagonal. Of note, `lasso` integrates out the variance information $\boldsymbol{\sigma}^2$ and estimates a posterior mode $\hat{\boldsymbol{\beta}}$. The $\it{l_1}$ penalty ensures a sparse solution can be achieved.
+
+### Empirical Bayesian Lasso (`EBlasso`)
+
+`EBglmnet` keeps the variance information integrated out in `lasso` while still enjoying the sparse property by taking a different and slightly complicated approach as showing below using `EBlasso-NE` as an example:
+
+In contrary to the marginalization on  $\boldsymbol{\beta}$, the first step in `EBlasso-NE` is to obtain a marginal posterior distribution for  $\boldsymbol{\sigma}^2$ :
+
+$$
+\mathit{p}(\boldsymbol{\sigma}^2|\mathit{\boldsymbol{y}},\mathbf{X},\mu,\lambda, \varphi) = \int\left[\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)\cdot (2\pi)^{-p/2}\lvert\mathbf{A}\rvert^{1/2}\exp\{-\frac{1}{2}\boldsymbol{\beta}^T\mathbf{A}\boldsymbol{\beta}\}\cdot \prod^p_{j=1}\lambda\exp\{-\lambda\sigma_j^2\} + c\right]d\boldsymbol{\beta},
+$$
+
+where $c$ is a constant.
+While the integral in `lasso` is achieved through the conjugated normal + exponential (NE) prior, the integral in `EBlasso-NE` is completed through mixture of two normal distributions:  $\it{p}$($\boldsymbol{\beta}|\boldsymbol{\sigma}^2$) and  $\mathit{p}$($\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi$), and the latter one typically is approximated to a normal distribution through Laplace approximation if itself is not a normal PDF. Then the estimate of $\hat{\boldsymbol{\sigma}}^2$ can be obtained by maximizing this marginal posterior distribution, which has the following form:
+
+$$
+\hat{\boldsymbol{\sigma}}^2 = \arg_{\boldsymbol{\sigma}^2}\max \log \mathit{p}(\boldsymbol{\sigma}^2|\mathit{\boldsymbol{y}},\mathbf{X},\mu,\lambda, \varphi)\\
+= \arg_{\boldsymbol{\sigma}^2}\max \left[
+\log\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\sigma}^2, \varphi,\lambda)-\sum^p_{j=1}\lambda\sigma_j^2 + c\right].
+$$
+
+Given the constraint that $\boldsymbol{\sigma}^2 > 0$, the above equation is actually maximizing the $\it{l_1}$ penalized marginal likelihood function of $\boldsymbol{\sigma}^2$, which images the $\it{l_1}$ penalty in `lasso` with the beauty of producing a sparse solution for $\hat{\boldsymbol{\sigma}}^2$. Note that if $\hat{\sigma_j}^2 = 0$, $\hat{\beta_j}$ will also be zero and variable $\mathit{x}_j$ will be excluded from the model.  Finally, With the sparse estimate of $\hat{\boldsymbol{\sigma}}^2$, the posterior estimate of $\hat{\boldsymbol{\beta}}$ and other nuance parameters can then be obtained accordingly.
+
+
+### Hierarchical Prior Distributions in `EBglmnet`
+
+#### Prior 1: EBlasso-NE
+
+$$
+\beta_j  \sim \mathit{N}(0,\sigma_j^2),\\
+\sigma_j^2  \sim \exp(\lambda), j = 1, \dots, p
+$$
+
+As illustrated above, assuming a Normal + Exponential hierarchical prior distribution on $\boldsymbol{\beta}$ (`EBlasso-NE`) will yield exactly the Lasso Prior. `EBlasso-NE` accommodates the properties of sparse solution and hypothesis testing given both the estimated mean and variance information in  $\hat{\boldsymbol{\beta}}$ and $\hat{\boldsymbol{\sigma}}^2$.  The NE prior is "peak zero and flat tails", which can select variables with relatively small effect size while shrinking most of non-effects to exactly zero. `EBlasso-NE` can be applied to natural population analysis when effect sizes are relatively small.
+
+#### Prior 2: EBlasso-NEG
+In simulation and real data analysis, it is observed that the prior in `EBlasso-NE` has a relatively large probability mass on the nonzero tails, resulting in large number of non-zero small effects with large $p-values$. We further developed another well studied conjugated hierarchical prior distribution under the empirical Bayesian framework, the Normal + Exponential + Gamma (NEG) prior:
+
+$$
+\beta_j  \sim \mathit{N}(0,\sigma_j^2),\\
+\sigma_j^2  \sim \exp(\lambda), j = 1, \dots,p \\
+\lambda \sim gamma(a,b)
+$$
+
+Comparing to `EBlasso-NE`, the NEG prior has a larger probability centered at 0, and will only yield nonzero regression coefficients for effects having relatively large signal to noise ratio. 
+
+#### Prior 3: Elastic Net Prior for Grouping Effect
+
+Similar as `lasso`, `EBlasso` typically selects one variable out of a group of correlated variables. While `elastic net` was developed to encourage a grouping effect by incorporating an $\it{l_2}$ penalty term, `EBglmnet` implemented an innovative `elastic net` hierarchical prior:
+
+$$
+\beta  \sim \mathit{N}\left[0,(\lambda_1 + \tilde{\sigma_j}^{-2})^{-1}\right], \\
+\tilde{\sigma_j}^2  \sim generalized\ gamma(\lambda_1,\lambda_2), j = 1, \dots, p.
+$$
+
+The generalized gamma distribution has probability density function (PDF): $f(\tilde{\sigma_j}^2|\lambda_1, \lambda_2) = c(\lambda_1\tilde{\sigma_j}^2 + 1)^{-1/2}\exp\{-\lambda_2\tilde{\sigma_j}^2\}, j=1,\dots,p$, with c being a normalization constant. The property of this prior can be appreciated from the following aspects:
+
+##### (1): $\lambda_1 = 0$
+
+When $\lambda_1 = 0$ the generalized gamma distribution becomes an exponential distribution: $f(\tilde{\sigma_j}^2|\lambda_2) = c\exp\{-\lambda_2\tilde{\sigma_j}^2\}, j=1,\dots,p$, with $c= \lambda_2$, and the elastic net prior is reduced to the two level `EBlasso-NE` prior.
+
+##### (2): $\lambda_1 > 0$
+
+When $\lambda_1 > 0$ the generalized gamma distribution can be written as a shift gamma distribution having the following PDF: $f(\tilde{\sigma_j}^2|a,b,\gamma) = \frac{b^a}{\Gamma(a)}(\tilde{\sigma_j}^2 - \gamma)^{a-1}\exp\{-b(\tilde{\sigma_j}^2 - \gamma)\}$, where $a=1/2, b = \lambda_2$, and $\gamma = -1/\lambda_1$. In (Huang A. 2015), it is proved that the marginal prior distribution for $\beta_j$ can be obtained as $p(\beta_j)\propto\exp\{-\frac{\lambda_1}{2}\beta_j^2 - \sqrt{2\lambda_2}|\beta_j|\}$, which is equivalent with the `elastic net` method in `glmnet`.  
+
+##### (3): structure of $\boldsymbol{\sigma}^2$ and interpretation of the `elastic net` prior
+
+Note that the prior variance for the regression coefficients has this form: $\boldsymbol{\sigma}^2=\tilde{\boldsymbol{\sigma}}^{2}/(\lambda_1\tilde{\boldsymbol{\sigma}}^2+\mathit{\boldsymbol{I}})$. This structure seems counter intuitive at first glance. However, if we look at it from precision point of view, i.e., precision $\boldsymbol{\alpha} = \boldsymbol{\sigma}^{-2}$, and $\tilde{\boldsymbol{\alpha}} = \tilde{\boldsymbol{\sigma}}^{-2}$, then we have:
+
+
+$$
+\boldsymbol{\alpha} =\lambda_1\mathit{\boldsymbol{I}} +  \tilde{\boldsymbol{\alpha}}.
+$$
+
+The above equation demonstrates that we actually decompose the precision of the normal prior into a fixed component $\lambda_1$ shared by all explanatory variables and a random component $\tilde{\boldsymbol{\alpha}}$ that is unique for each explanatory variable. This design represents the mathematical balance between the inter-group independence and intra-group correlation among explanatory variables, and is aligned with the objective of sparseness while encouraging grouping effects.
+
+The empirical Bayesian elastic net (EBEN) in `EBglmnet` is solved similar as `EBlasso` using the aforementioned empirical Bayesian approach. Research studies presented in the reference papers demonstrated that `EBEN` has better performance comparing with `elastic net` in terms of Power of Detection, False Discovery Rate, and most importantly, Power of Detecting Groups. 
+
+### `EBglmnet` Implementation and Usage
+
+The `EBglmnet` algorithms use greedy coordinate descent, which successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. Key algorithms are implemented in C/C++ with matrix computation using the BLAS/LAPACK packages.  Due to closed form solutions for $\hat{\boldsymbol{\sigma}}^2$ in all prior setups and other algorithmic and programming techniques, the algorithms can compute the solutions very fast.
+
+We recommend to use `EBlasso-NEG` when there are a large number of candidate effects (eg. $\ge 10^6$ number of effects such as whole-genome epistasis analysis and GWAS), and use `EBEN` when there are groups of highly correlated variables.
+
+The authors of `EBglmnet` are Anhui Huang  and Dianting Liu. This vignette describes the principle and usage of `EBglmnet` in R. Users are referred to the papers in the reference section for details of the algorithms.
+
+<a id="install"></a>
+
+## Installation
+ 
+With Admin Permission on PC, `EBglmnet` can be installed directly from CRAN using the following command in R console:
+
+```{r, eval=FALSE}
+install.packages("EBglmnet", repos = "http://cran.us.r-project.org")
+```
+
+which will download and install the package to the default directories. When Admin Permission is not immediately available, users can download the pre-compiled binary file at http://cran.r-project.org/web/packages/EBglmnet/index.html, and install it from local package.
+
+[Back to Top](#top)
+
+<a id="qs"></a>
+
+## Quick Start
+ 
+We will give users a general idea of the package by using a simple example that demonstrates the basis package usage. Through running the main functions and examining the outputs, users may have a better idea on how the package works, what functions are available, which parameters to choose, as well as where to seek help. More details are given in later sections.
+
+Let us first clear up the workspace and load the `EBglmnet` package:
+```{r}
+rm(list = ls())
+set.seed(1)
+library(EBglmnet)
+```
+We will use an R built-in dataset `state.x77` as an example, which includes a matrix with 50 rows and 8 columns giving the following measurements in the respective columns: Population, Income, Illiteracy, Life Expectancy, Murder Rate, High School Graduate Rate, Days Below Freezing Temperature, and Land Area. The default model used in the package is the Gaussian linear model, and we will demonstrate it using Life Expectancy as the response variable and the remaining as explanatory variables. We create the input data as shown below, and users can load their own data and prepare variable `y` and `x` following this example.
+```{r}
+varNames = colnames(state.x77);
+varNames
+y= state.x77[,"Life Exp"]
+xNames = c("Population","Income","Illiteracy", "Murder","HS Grad","Frost","Area")
+x = state.x77[,xNames]
+```
+We fit the model using the most basic call to  `EBglmnet` with default prior
+```{r}
+output = EBglmnet(x,y,hyperparameters = c(0.1, 0.1))
+```
+"output" is a list containing all the relevant information of the fitted model. Users can examine the output by directly looking at each elements in the list. Particularly, the sparse regression coefficients can be extracted as shown below:
+```{r}
+glmfit = output$fit
+variables = xNames[glmfit[,1,drop=FALSE]]
+cbind(variables,as.data.frame(round(glmfit[,3:6,drop=FALSE],4)))
+```
+The hyperparameters in each of the prior distributions control the number of non-zero effects to be selected, and  Cross-validation is perhaps the simplest and most widely used method in deciding their values. `cv.EBglmnet` is the main function to do cross-validation, which can be called using the following code.
+```{r}
+cvfit = cv.EBglmnet(x, y)
+```
+`cv.EBglmnet` returns a `cv.EBglmnet` object, which is a list with all the ingredients of the CV and the final fit results using CV selected optimal hyperparameters. We can view the CV results, selected hyperparameters and the corresponding coefficients. For example, CV using different hyperparameters and the corresponding prediction errors are shown below:
+```{r}
+cvfit$CrossValidation
+```
+The selected parameters and the corresponding fitting results:
+```{r}
+cvfit$hyperparameters
+cvfit$fit
+```
+[Back to Top](#top)
+
+<a id="glm"></a>
+
+## GLM Family
+
+ 
+Two families of models have been developed in `EBglmnet`, the  `gaussian` family and the `binomial` family, which are essentially different probability distribution assumptions on the response variable `y`.
+
+### Gaussian Model
+`EBglmnet` assumes a Gaussian distribution on `y` by default, i.e., $\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi) = N( \mu\mathit{\boldsymbol{I}} + \mathbf{X}\boldsymbol{\beta}, \sigma_0^2\boldsymbol{I})$, where $\varphi= \sigma_0^2$ is the residual variance. In the above example, both $\hat{\mu}$ and $\hat{\sigma_0}^2$ are listed in the output: 
+```{r}
+output$Intercept
+output$residual
+```
+### Binomial Model
+ 
+If there are two possible outcomes in the response variable, a binomial distribution assumption on `y` is available in `EBglmnet`, which has $\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)$ following a binomial distribution and $\varphi\in\emptyset$. Same as the widely-used logistic regression model, the link function is $\eta_i = logit(p_i)=\log(\frac{Pr(y_i)=1}{1-Pr(y_i=1)}), i = 1, \dots, n$. To run `EBglmnet` with binomial models, users need to specify the parameter `family` as `binomial`:
+```{r}
+yy = y>mean(y);
+output = EBglmnet(x,yy,family="binomial", hyperparameters = c(0.1, 0.1))
+```
+For illustration purpose, the above codes created a binary variable `yy` by set the cutoff at the mean Life Expectancy value. 
+
+[Back to Top](#top)
+
+<a id="prior"></a>
+
+##Prior, Hyperparameters and Epistasis
+
+The three sets of hierarchical prior distribution can be specified by `prior` option in `EBglmnet`. By default, `EBglmnet` assumes the `lassoNEG` prior, to change to other priors:
+```{r}
+output = EBglmnet(x,yy,family="binomial", prior = "elastic net", hyperparameters = c(0.1, 0.1))
+```
+Note that the hyperparameters setup is associated with a specific prior. In `lasso` prior, only one hyperparameter $\lambda$ is required, while in `elastic net` and `lassoNEG`, two hyperparameters need to be specified. For `EBEN` having the `elastic net` prior distribution, the two hyperparameters $\lambda_1$ and $\lambda_2$ are defined in terms of other two parameters $\alpha \in [0,1]$ and $\lambda>0$ same as in `glmnet` package, such that $\lambda_1 = (1-\alpha)\lambda$ and  $\lambda_2 = \alpha\lambda$. Therefore, users are asked to specify $hyperparameters=c(\alpha, \lambda)$. 
+
+
+In genetic and population analysis, sometimes it is interested in analyzing the interaction terms among the variables. `EBglmnet` provides a feature that can incorporate all pair-wise interactions into analysis, which is achieved by setting `Epis` as `TRUE`:
+```{r}
+output = EBglmnet(x,yy,family="binomial", prior = "elastic net", hyperparameters = c(0.1, 0.1),Epis = TRUE)
+output$fit
+```
+When `Epis = TRUE`, both $p$ number of main effects and $p(p-1)/2$ number of interaction effects are considered in the model. In the output, `locus1` and `locus2` denote the pair of interaction variables, and if the numbers are the same, the corresponding effect is from a main effect.  Users should be aware of the significant larger number variables considered (i.e., $p(p-1)/2$ more variables), and `EBglmnet` will need longer time when $p$ is large for the program to finish the computation.
+
+[Back to Top](#top)
+
+
+## References
+ 
+
+<p>Anhui Huang, Shizhong Xu and Xiaodong Cai. (2015). <br>
+<a href="http://www.nature.com/hdy/journal/v114/n1/full/hdy201479a.html/">Empirical Bayesian elastic net for multiple quantitative trait locus mapping</a><br>
+<em>Heredity</em>, Vol. 114(1), 107-115.</p>
+<p>Anhui Huang, Shizhong Xu and Xiaodong Cai. (2014a).<br>
+<a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0087330/">Whole-genome quantitative trait locus mapping reveals major role of epistasis on yield of rice</a><br>
+<em>PLoS ONE</em>, Vol. 9(1) e87330.</p>
+<p>Anhui Huang, Eden Martin, Jeffery Vance, and Xiaodong Cai (2014b).<br>
+<a href="http://onlinelibrary.wiley.com/doi/10.1002/gepi.21803/abstract?userIsAuthenticated=false&deniedAccessCustomisedMessage=/">Detecting genetic interactions in pathway-based genome-wide association studies</a><br>
+<em>Genetic Epidemiology</em>, 38(4), 300-309.</p>
+<p> Anhui Huang, Shizhong Xu and Xiaodong Cai. (2013). <br>
+<a href="http://www.biomedcentral.com/1471-2156/14/5">Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping </a><br>
+<em>BMC Genetics</em>, 14(1),5.</p>
+<p>Xiaodong Cai, Anhui Huang and Shizhong Xu (2011). <br>
+<a href="http://www.biomedcentral.com/1471-2105/12/211">Fast empirical Bayesian LASSO for multiple quantitative trait locus mapping </a><br>
+<em>BMC Bioinformatics</em>, 12(1),211.</p>

@@ -376,7 +376,7 @@ void fEBBinaryMexBmNeEN(int *Used, double *Mu2, double *SIGMA2, double *H2, doub
 		fEBDeltaMLBmNeEN(DeltaML, Action, AlphaRoot,anyToDelete,Used, Unused, S_out, Q_out, Alpha,
 				a_Lambda,b_Alpha, N_used, N_unused);
 		//
-        deltaLogMarginal			= 0;
+        deltaLogMarginal			= 0.001;
         nu							= -1;
         for(i=0;i<M_full;i++)
         {
@@ -458,9 +458,12 @@ void fEBBinaryMexBmNeEN(int *Used, double *Mu2, double *SIGMA2, double *H2, doub
 			//Rprintf("\t\t newAlpha: %f\n",newAlpha);
             // B_phi*PHI2*SIGMA2        tmp = B_phi*PHI2 
             index					= N_used + 1;
-			if(index >basisMax && iter>1) {
-				Rprintf("out of Memory!\n");
-				return;
+			if(index > (basisMax -10) && iter>1 && (N*K) > 1e7) {
+				Rprintf("bases: %d, warning: out of Memory!\n",index);
+			}//return;
+			if(index > (basisMax -1) && iter>1 && (N*K) > 1e7) {
+				Rprintf("bases: %d, out of Memory,exiting program!\n",index);
+				//exit(1);			
 			}
             for(i=0;i<index;i++)
             {

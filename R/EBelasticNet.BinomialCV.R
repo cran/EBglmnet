@@ -1,29 +1,34 @@
-EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
+EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0)
 {
 
 	cat("EBEN Logistic Model, NE prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
 	#set.seed(proc.time())
-	if(N%%nFolds!=0){
-		foldId 			= sample(c(rep(1:nFolds,floor(N/nFolds)),1:(N%%nFolds)),N);
-	}else{
-		foldId 			= sample(rep(1:nFolds,floor(N/nFolds)),N);
+	if (missing(foldId)) 
+	{
+		if(N%%nFolds!=0){
+			foldId 			= sample(c(rep(1:nFolds,floor(N/nFolds)),1:(N%%nFolds)),N);
+		}else{
+			foldId 			= sample(rep(1:nFolds,floor(N/nFolds)),N);
+		}
 	}
 	lambda_Max			= log(1.1);
+	ynorm 				= sqrt(sum(Target*Target));
+	ynormal 			= Target/ynorm;
+	
 	for(i_b in 1:K){
 		basis 			= BASIS[,i_b];
-		basis 			= basis/sum(basis*basis);
-		corBy 			= basis%*%(Target-mean(Target));
+		basis 			= basis/sqrt(sum(basis*basis));
+		corBy 			= basis%*%ynormal;
 		if(corBy>lambda_Max) lambda_Max = corBy;
-	}
-	
-	if(Epis == "yes"){
+	}	
+	if(Epis){
 		for(i_b in 1:(K-1)){
 			for(i_bj in (i_b + 1):K){
 				basis 	= BASIS[,i_b]*BASIS[,i_bj];
-				basis 	= basis/sum(basis*basis);
-				corBy 	= basis%*%(Target-mean(Target));
+				basis 	= basis/sqrt(sum(basis*basis));
+				corBy 	= basis%*%ynormal;
 				if(corBy>lambda_Max) lambda_Max = corBy;
 			}
 		}		
@@ -43,7 +48,7 @@ EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 	logL 				= mat.or.vec(nFolds,1);
 	for(i_alpha in 1:nAlpha){
 		alpha 			= Alpha[i_alpha];
-		cat("Testing alpha", i_alpha, "/",nAlpha,":\t\talpha: ",alpha,"\n")
+		if(verbose >=0) cat("Testing alpha", i_alpha, "/",nAlpha,":\t\talpha: ",alpha,"\t")
 		for (i_s in 1:N_step){
 			
 			lambda 		= Lambda[i_s];
@@ -56,9 +61,9 @@ EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 				index  			= which(foldId == i);
 				Basis.Test  	= BASIS[index,];
 				Target.Test 	= Target[index];
-				SimF2fEB 		<-EBelasticNet.Binomial(Basis.Train,Target.Train,lambda,alpha,Epis);
-				M				= length(SimF2fEB$weight)/6;
-				Betas 			<- matrix(SimF2fEB$weight,nrow= M,ncol =6, byrow= FALSE);
+				SimF2fEB 		<-EBelasticNet.Binomial(Basis.Train,Target.Train,lambda,alpha,Epis, verbose);
+				M				= length(SimF2fEB$fit)/6;
+				Betas 			<- matrix(SimF2fEB$fit,nrow= M,ncol =6, byrow= FALSE);
 				Mu  			= Betas[,3];
 				Mu0 			= SimF2fEB$Intercept[1];
 				
@@ -76,14 +81,17 @@ EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,Epis="no")
 				logL[i] 	= mean(Target.Test*log(temp/(1+temp)) + (1-Target.Test)*log(1/(1+temp)));
 			}
 			Likelihood[step,] = c(alpha, lambda,mean(logL),sd(logL));
+			if(verbose >=0) cat("lambda:",lambda,"\t log Likelihood",mean(logL),"\n");
 			step 			= step + 1;
 		}
 		
 	}
+	colnames(Likelihood) = c("alpha","lambda","logLikelihood","standard error");
 	index 				= which.max(Likelihood[,3]);
 	Res.lambda			= Likelihood[index,2];
 	Res.alpha 			= Likelihood[index,1];
-	result 				<- list(Likelihood,Res.alpha,Res.lambda);
-	names(result)		<-c("CrossValidation","Alpha_optimal","Lambda_optimal");
+	opt_para 				= c(Res.alpha,Res.lambda);	
+	result 				<- list(Likelihood,opt_para);
+	names(result)		<-c("CrossValidation","optimal hyperparameter");
 	return(result);
 }

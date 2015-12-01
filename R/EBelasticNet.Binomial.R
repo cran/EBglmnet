@@ -1,9 +1,9 @@
 EBelasticNet.Binomial <-
-function(BASIS,Target,lambda,alpha,Epis = "no",verbose = 0){
+function(BASIS,Target,lambda,alpha,Epis = FALSE,verbose = 0){
 	N 				= nrow(BASIS);
 	K 				= ncol(BASIS);
 	if (verbose>0) 	cat("EBEN Logistic Model, Epis: ",Epis,"\n");
-	if(Epis == "yes"){
+	if(Epis){
 		N_effect 		= (K+1)*K/2;
 		Beta 			= rep(0,N_effect *4);
 
@@ -48,14 +48,10 @@ function(BASIS,Target,lambda,alpha,Epis = "no",verbose = 0){
 	ToKeep 			= which(result[,3]!=0);
 	if(length(ToKeep)==0) {  Blup = matrix(0,1,4)
 	}else	Blup 	 = result[ToKeep,,drop= FALSE];
-	if(Epis == "yes"){
-		blupMain 		= Blup[Blup[,1] ==Blup[,2],];
-		nMain 			= length(blupMain)/4;
-		blupMain 		= matrix(blupMain,nMain,4);
+	if(Epis){
+		blupMain 		= Blup[Blup[,1] ==Blup[,2],,drop = FALSE];
 		#
-		blupEpis 		= Blup[Blup[,1] !=Blup[,2],];
-		nEpis 			= length(blupEpis)/4;
-		blupEpis 		= matrix(blupEpis,nEpis,4);
+		blupEpis 		= Blup[Blup[,1] !=Blup[,2],,drop = FALSE];
 		
 		order1 			= order(blupMain[,1]);
 		order2 			= order(blupEpis[,1]);
@@ -64,18 +60,23 @@ function(BASIS,Target,lambda,alpha,Epis = "no",verbose = 0){
 	
 	#t-test:
 	t 				= abs(Blup[,3])/(sqrt(Blup[,4])+ 1e-20);
-	pvalue 			= 1- pt(t,df=(N-1));
+pvalue 			= 2*(1- pt(t,df=(N-1)));
 	Blup 			= cbind(Blup,t,pvalue); 			#M x 6
+	
+	
+
+	colnames(Blup) = c("locus1","locus2","beta","posterior variance","t-value","p-value");	
+
 	#col1: index1
 	#col2: index2
 	#col3: beta
 	#col4: variance
 	#col5: t-value
 	#col6: p-value
-	
-	fEBresult 			<- list(Blup,output$logLikelihood,output$WaldScore,output$Intercept,lambda,alpha);
+	hyperparameters = c(alpha, lambda);
+	fEBresult 			<- list(Blup,output$logLikelihood,output$WaldScore,output$Intercept[1],hyperparameters);
 	rm(list= "output")	
-	names(fEBresult)		<-c("weight","logLikelihood","WaldScore","Intercept","lambda","alpha")
+	names(fEBresult)		<-c("fit","logLikelihood","WaldScore","Intercept","hyperparameters")
 	return(fEBresult)
 	
 }

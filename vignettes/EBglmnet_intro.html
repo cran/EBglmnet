@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>output: pdf_document</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+<!-- Styles for R syntax highlighter -->
+<style type="text/css">
+   pre .operator,
+   pre .paren {
+     color: rgb(104, 118, 135)
+   }
+
+   pre .literal {
+     color: #990073
+   }
+
+   pre .number {
+     color: #099;
+   }
+
+   pre .comment {
+     color: #998;
+     font-style: italic
+   }
+
+   pre .keyword {
+     color: #900;
+     font-weight: bold
+   }
+
+   pre .identifier {
+     color: rgb(0, 0, 0);
+   }
+
+   pre .string {
+     color: #d14;
+   }
+</style>
+
+<!-- R syntax highlighter -->
+<script type="text/javascript">
+var hljs=new function(){function m(p){return p.replace(/&/gm,"&amp;").replace(/</gm,"&lt;")}function f(r,q,p){return RegExp(q,"m"+(r.cI?"i":"")+(p?"g":""))}function b(r){for(var p=0;p<r.childNodes.length;p++){var q=r.childNodes[p];if(q.nodeName=="CODE"){return q}if(!(q.nodeType==3&&q.nodeValue.match(/\s+/))){break}}}function h(t,s){var p="";for(var r=0;r<t.childNodes.length;r++){if(t.childNodes[r].nodeType==3){var q=t.childNodes[r].nodeValue;if(s){q=q.replace(/\n/g,"")}p+=q}else{if(t.childNodes[r].nodeName=="BR"){p+="\n"}else{p+=h(t.childNodes[r])}}}if(/MSIE [678]/.test(navigator.userAgent)){p=p.replace(/\r/g,"\n")}return p}function a(s){var r=s.className.split(/\s+/);r=r.concat(s.parentNode.className.split(/\s+/));for(var q=0;q<r.length;q++){var p=r[q].replace(/^language-/,"");if(e[p]){return p}}}function c(q){var p=[];(function(s,t){for(var r=0;r<s.childNodes.length;r++){if(s.childNodes[r].nodeType==3){t+=s.childNodes[r].nodeValue.length}else{if(s.childNodes[r].nodeName=="BR"){t+=1}else{if(s.childNodes[r].nodeType==1){p.push({event:"start",offset:t,node:s.childNodes[r]});t=arguments.callee(s.childNodes[r],t);p.push({event:"stop",offset:t,node:s.childNodes[r]})}}}}return t})(q,0);return p}function k(y,w,x){var q=0;var z="";var s=[];function u(){if(y.length&&w.length){if(y[0].offset!=w[0].offset){return(y[0].offset<w[0].offset)?y:w}else{return w[0].event=="start"?y:w}}else{return y.length?y:w}}function t(D){var A="<"+D.nodeName.toLowerCase();for(var B=0;B<D.attributes.length;B++){var C=D.attributes[B];A+=" "+C.nodeName.toLowerCase();if(C.value!==undefined&&C.value!==false&&C.value!==null){A+='="'+m(C.value)+'"'}}return A+">"}while(y.length||w.length){var v=u().splice(0,1)[0];z+=m(x.substr(q,v.offset-q));q=v.offset;if(v.event=="start"){z+=t(v.node);s.push(v.node)}else{if(v.event=="stop"){var p,r=s.length;do{r--;p=s[r];z+=("</"+p.nodeName.toLowerCase()+">")}while(p!=v.node);s.splice(r,1);while(r<s.length){z+=t(s[r]);r++}}}}return z+m(x.substr(q))}function j(){function q(x,y,v){if(x.compiled){return}var u;var s=[];if(x.k){x.lR=f(y,x.l||hljs.IR,true);for(var w in x.k){if(!x.k.hasOwnProperty(w)){continue}if(x.k[w] instanceof Object){u=x.k[w]}else{u=x.k;w="keyword"}for(var r in u){if(!u.hasOwnProperty(r)){continue}x.k[r]=[w,u[r]];s.push(r)}}}if(!v){if(x.bWK){x.b="\\b("+s.join("|")+")\\s"}x.bR=f(y,x.b?x.b:"\\B|\\b");if(!x.e&&!x.eW){x.e="\\B|\\b"}if(x.e){x.eR=f(y,x.e)}}if(x.i){x.iR=f(y,x.i)}if(x.r===undefined){x.r=1}if(!x.c){x.c=[]}x.compiled=true;for(var t=0;t<x.c.length;t++){if(x.c[t]=="self"){x.c[t]=x}q(x.c[t],y,false)}if(x.starts){q(x.starts,y,false)}}for(var p in e){if(!e.hasOwnProperty(p)){continue}q(e[p].dM,e[p],true)}}function d(B,C){if(!j.called){j();j.called=true}function q(r,M){for(var L=0;L<M.c.length;L++){if((M.c[L].bR.exec(r)||[null])[0]==r){return M.c[L]}}}function v(L,r){if(D[L].e&&D[L].eR.test(r)){return 1}if(D[L].eW){var M=v(L-1,r);return M?M+1:0}return 0}function w(r,L){return L.i&&L.iR.test(r)}function K(N,O){var M=[];for(var L=0;L<N.c.length;L++){M.push(N.c[L].b)}var r=D.length-1;do{if(D[r].e){M.push(D[r].e)}r--}while(D[r+1].eW);if(N.i){M.push(N.i)}return f(O,M.join("|"),true)}function p(M,L){var N=D[D.length-1];if(!N.t){N.t=K(N,E)}N.t.lastIndex=L;var r=N.t.exec(M);return r?[M.substr(L,r.index-L),r[0],false]:[M.substr(L),"",true]}function z(N,r){var L=E.cI?r[0].toLowerCase():r[0];var M=N.k[L];if(M&&M instanceof Array){return M}return false}function F(L,P){L=m(L);if(!P.k){return L}var r="";var O=0;P.lR.lastIndex=0;var M=P.lR.exec(L);while(M){r+=L.substr(O,M.index-O);var N=z(P,M);if(N){x+=N[1];r+='<span class="'+N[0]+'">'+M[0]+"</span>"}else{r+=M[0]}O=P.lR.lastIndex;M=P.lR.exec(L)}return r+L.substr(O,L.length-O)}function J(L,M){if(M.sL&&e[M.sL]){var r=d(M.sL,L);x+=r.keyword_count;return r.value}else{return F(L,M)}}function I(M,r){var L=M.cN?'<span class="'+M.cN+'">':"";if(M.rB){y+=L;M.buffer=""}else{if(M.eB){y+=m(r)+L;M.buffer=""}else{y+=L;M.buffer=r}}D.push(M);A+=M.r}function G(N,M,Q){var R=D[D.length-1];if(Q){y+=J(R.buffer+N,R);return false}var P=q(M,R);if(P){y+=J(R.buffer+N,R);I(P,M);return P.rB}var L=v(D.length-1,M);if(L){var O=R.cN?"</span>":"";if(R.rE){y+=J(R.buffer+N,R)+O}else{if(R.eE){y+=J(R.buffer+N,R)+O+m(M)}else{y+=J(R.buffer+N+M,R)+O}}while(L>1){O=D[D.length-2].cN?"</span>":"";y+=O;L--;D.length--}var r=D[D.length-1];D.length--;D[D.length-1].buffer="";if(r.starts){I(r.starts,"")}return R.rE}if(w(M,R)){throw"Illegal"}}var E=e[B];var D=[E.dM];var A=0;var x=0;var y="";try{var s,u=0;E.dM.buffer="";do{s=p(C,u);var t=G(s[0],s[1],s[2]);u+=s[0].length;if(!t){u+=s[1].length}}while(!s[2]);if(D.length>1){throw"Illegal"}return{r:A,keyword_count:x,value:y}}catch(H){if(H=="Illegal"){return{r:0,keyword_count:0,value:m(C)}}else{throw H}}}function g(t){var p={keyword_count:0,r:0,value:m(t)};var r=p;for(var q in e){if(!e.hasOwnProperty(q)){continue}var s=d(q,t);s.language=q;if(s.keyword_count+s.r>r.keyword_count+r.r){r=s}if(s.keyword_count+s.r>p.keyword_count+p.r){r=p;p=s}}if(r.language){p.second_best=r}return p}function i(r,q,p){if(q){r=r.replace(/^((<[^>]+>|\t)+)/gm,function(t,w,v,u){return w.replace(/\t/g,q)})}if(p){r=r.replace(/\n/g,"<br>")}return r}function n(t,w,r){var x=h(t,r);var v=a(t);var y,s;if(v){y=d(v,x)}else{return}var q=c(t);if(q.length){s=document.createElement("pre");s.innerHTML=y.value;y.value=k(q,c(s),x)}y.value=i(y.value,w,r);var u=t.className;if(!u.match("(\\s|^)(language-)?"+v+"(\\s|$)")){u=u?(u+" "+v):v}if(/MSIE [678]/.test(navigator.userAgent)&&t.tagName=="CODE"&&t.parentNode.tagName=="PRE"){s=t.parentNode;var p=document.createElement("div");p.innerHTML="<pre><code>"+y.value+"</code></pre>";t=p.firstChild.firstChild;p.firstChild.cN=s.cN;s.parentNode.replaceChild(p.firstChild,s)}else{t.innerHTML=y.value}t.className=u;t.result={language:v,kw:y.keyword_count,re:y.r};if(y.second_best){t.second_best={language:y.second_best.language,kw:y.second_best.keyword_count,re:y.second_best.r}}}function o(){if(o.called){return}o.called=true;var r=document.getElementsByTagName("pre");for(var p=0;p<r.length;p++){var q=b(r[p]);if(q){n(q,hljs.tabReplace)}}}function l(){if(window.addEventListener){window.addEventListener("DOMContentLoaded",o,false);window.addEventListener("load",o,false)}else{if(window.attachEvent){window.attachEvent("onload",o)}else{window.onload=o}}}var e={};this.LANGUAGES=e;this.highlight=d;this.highlightAuto=g;this.fixMarkup=i;this.highlightBlock=n;this.initHighlighting=o;this.initHighlightingOnLoad=l;this.IR="[a-zA-Z][a-zA-Z0-9_]*";this.UIR="[a-zA-Z_][a-zA-Z0-9_]*";this.NR="\\b\\d+(\\.\\d+)?";this.CNR="\\b(0[xX][a-fA-F0-9]+|(\\d+(\\.\\d*)?|\\.\\d+)([eE][-+]?\\d+)?)";this.BNR="\\b(0b[01]+)";this.RSR="!|!=|!==|%|%=|&|&&|&=|\\*|\\*=|\\+|\\+=|,|\\.|-|-=|/|/=|:|;|<|<<|<<=|<=|=|==|===|>|>=|>>|>>=|>>>|>>>=|\\?|\\[|\\{|\\(|\\^|\\^=|\\||\\|=|\\|\\||~";this.ER="(?![\\s\\S])";this.BE={b:"\\\\.",r:0};this.ASM={cN:"string",b:"'",e:"'",i:"\\n",c:[this.BE],r:0};this.QSM={cN:"string",b:'"',e:'"',i:"\\n",c:[this.BE],r:0};this.CLCM={cN:"comment",b:"//",e:"$"};this.CBLCLM={cN:"comment",b:"/\\*",e:"\\*/"};this.HCM={cN:"comment",b:"#",e:"$"};this.NM={cN:"number",b:this.NR,r:0};this.CNM={cN:"number",b:this.CNR,r:0};this.BNM={cN:"number",b:this.BNR,r:0};this.inherit=function(r,s){var p={};for(var q in r){p[q]=r[q]}if(s){for(var q in s){p[q]=s[q]}}return p}}();hljs.LANGUAGES.cpp=function(){var a={keyword:{"false":1,"int":1,"float":1,"while":1,"private":1,"char":1,"catch":1,"export":1,virtual:1,operator:2,sizeof:2,dynamic_cast:2,typedef:2,const_cast:2,"const":1,struct:1,"for":1,static_cast:2,union:1,namespace:1,unsigned:1,"long":1,"throw":1,"volatile":2,"static":1,"protected":1,bool:1,template:1,mutable:1,"if":1,"public":1,friend:2,"do":1,"return":1,"goto":1,auto:1,"void":2,"enum":1,"else":1,"break":1,"new":1,extern:1,using:1,"true":1,"class":1,asm:1,"case":1,typeid:1,"short":1,reinterpret_cast:2,"default":1,"double":1,register:1,explicit:1,signed:1,typename:1,"try":1,"this":1,"switch":1,"continue":1,wchar_t:1,inline:1,"delete":1,alignof:1,char16_t:1,char32_t:1,constexpr:1,decltype:1,noexcept:1,nullptr:1,static_assert:1,thread_local:1,restrict:1,_Bool:1,complex:1},built_in:{std:1,string:1,cin:1,cout:1,cerr:1,clog:1,stringstream:1,istringstream:1,ostringstream:1,auto_ptr:1,deque:1,list:1,queue:1,stack:1,vector:1,map:1,set:1,bitset:1,multiset:1,multimap:1,unordered_set:1,unordered_map:1,unordered_multiset:1,unordered_multimap:1,array:1,shared_ptr:1}};return{dM:{k:a,i:"</",c:[hljs.CLCM,hljs.CBLCLM,hljs.QSM,{cN:"string",b:"'\\\\?.",e:"'",i:"."},{cN:"number",b:"\\b(\\d+(\\.\\d*)?|\\.\\d+)(u|U|l|L|ul|UL|f|F)"},hljs.CNM,{cN:"preprocessor",b:"#",e:"$"},{cN:"stl_container",b:"\\b(deque|list|queue|stack|vector|map|set|bitset|multiset|multimap|unordered_map|unordered_set|unordered_multiset|unordered_multimap|array)\\s*<",e:">",k:a,r:10,c:["self"]}]}}}();hljs.LANGUAGES.r={dM:{c:[hljs.HCM,{cN:"number",b:"\\b0[xX][0-9a-fA-F]+[Li]?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+(?:[eE][+\\-]?\\d*)?L\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\b\\d+\\.(?!\\d)(?:i\\b)?",e:hljs.IMMEDIATE_RE,r:1},{cN:"number",b:"\\b\\d+(?:\\.\\d*)?(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"number",b:"\\.\\d+(?:[eE][+\\-]?\\d*)?i?\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"keyword",b:"(?:tryCatch|library|setGeneric|setGroupGeneric)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\.",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\.\\.\\d+(?![\\w.])",e:hljs.IMMEDIATE_RE,r:10},{cN:"keyword",b:"\\b(?:function)",e:hljs.IMMEDIATE_RE,r:2},{cN:"keyword",b:"(?:if|in|break|next|repeat|else|for|return|switch|while|try|stop|warning|require|attach|detach|source|setMethod|setClass)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"literal",b:"(?:NA|NA_integer_|NA_real_|NA_character_|NA_complex_)\\b",e:hljs.IMMEDIATE_RE,r:10},{cN:"literal",b:"(?:NULL|TRUE|FALSE|T|F|Inf|NaN)\\b",e:hljs.IMMEDIATE_RE,r:1},{cN:"identifier",b:"[a-zA-Z.][a-zA-Z0-9._]*\\b",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"<\\-(?!\\s*\\d)",e:hljs.IMMEDIATE_RE,r:2},{cN:"operator",b:"\\->|<\\-",e:hljs.IMMEDIATE_RE,r:1},{cN:"operator",b:"%%|~",e:hljs.IMMEDIATE_RE},{cN:"operator",b:">=|<=|==|!=|\\|\\||&&|=|\\+|\\-|\\*|/|\\^|>|<|!|&|\\||\\$|:",e:hljs.IMMEDIATE_RE,r:0},{cN:"operator",b:"%",e:"%",i:"\\n",r:1},{cN:"identifier",b:"`",e:"`",r:0},{cN:"string",b:'"',e:'"',c:[hljs.BE],r:0},{cN:"string",b:"'",e:"'",c:[hljs.BE],r:0},{cN:"paren",b:"[[({\\])}]",e:hljs.IMMEDIATE_RE,r:0}]}};
+hljs.initHighlightingOnLoad();
+</script>
+
+<!-- MathJax scripts -->
+<script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<hr/>
+
+<h2>output: pdf_document</h2>
+
+<!-- 
+%\VignetteEngine{knitr::knitr} 
+%\VignetteIndexEntry{An Introduction to EBglmnet}
+--> 
+
+<p><a id="top"></a></p>
+
+<h1>EBglmnet Vignette</h1>
+
+<h3>Anhui Huang and Dianting Liu</h3>
+
+<h4>Nov. 30, 2015</h4>
+
+<blockquote>
+<p><a href="#intro">Introduction</a></p>
+
+<p><a href="#install">Installation</a></p>
+
+<p><a href="#qs">Quick Start</a></p>
+
+<p><a href="#glm">GLM Family</a></p>
+
+<p><a href="#prior">Prior, Hyperparameters and Epistasis</a></p>
+</blockquote>
+
+<p><a id="intro"></a></p>
+
+<h2>Introduction</h2>
+
+<h4>Acronyms to be used</h4>
+
+<p>EBglmnet is a package that implemented the empirical Bayesian Lasso (EBlasso) and Elastic Net (EBEN) method for generalized linear models (GLMs). Additionally, in <code>EBlasso</code>, two different prior distributions are also developed: one with two-level hierarchical Normal + Exponential prior (denoted as <code>NE</code>), and the other one with three-level Normal + Exponential + gamma prior (denoted as <code>NEG</code>). The following names should not be confused with the <code>lasso</code> and <code>elastic net</code>  method in the comparison package <code>glmnet</code>:</p>
+
+<p><code>EBglmnet</code>: package that implements <code>EBlasso</code> and <code>EBEN</code> methods.</p>
+
+<p><code>EBlasso</code>: Empirical Bayesian method with <code>lasso</code> prior distribution, which includes two sets of prior distributions: <code>NE</code> and <code>NEG</code>.</p>
+
+<p><code>EBEN</code>: Empirical Bayesian method with <code>elastic net</code> prior distribution.</p>
+
+<p><code>lasso</code> prior: the hierarchical prior distribution that is equivalent with <code>lasso</code> penalty term when the marginal probability distribution for the regression coefficients is considered.</p>
+
+<p><code>elastic net</code> prior: the hierarchical prior distribution that is equivalent with <code>elastic net</code> penalty term when the marginal probability distribution for the regression coefficients is considered.</p>
+
+<p><code>EBlasso-NE</code>: <code>EBlasso</code> method having <code>NE</code> prior.</p>
+
+<p><code>EBlasso-NEG</code>: <code>EBlasso</code> method having <code>NEG</code> prior.</p>
+
+<h4>Generalized Linear Models (GLMs)</h4>
+
+<p>In a GLM </p>
+
+<p>\[
+ \boldsymbol{\eta}=\mu\mathit{\boldsymbol{I}}+\mathbf{X}\boldsymbol{\beta},
+\]
+where \(\bf X\) is an \(\it{n}\times\it{p}\) matrix containing \(\it{p}\) variables for \(\it{n}\) samples (\(\it{p}\) can be \(\gg \it{n}\)). \(\boldsymbol{\eta}\) is an \(\it{n}\times 1\) linear predictor and is related to the response variable  \(\mathit{\boldsymbol{y}}\) through a link function \(\it{g}\): E(\(\mathit{\mathbf{y}} |\bf X\))=\(\it{g}^{-1}\)(\(\mu\mathit{\boldsymbol{I}} +\mathbf{X}\boldsymbol{\beta}\)), and \(\boldsymbol{\beta}\) is a \(\it{p}\times 1\) vector of regression coefficients.
+Depending on certain assumption of the data distribution on \(\mathit{\boldsymbol{y}}\), the GLM is generally inferred through finding the set of model parameters that maximize the model likelihood function  \(\mathit{p}\)(\(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi\)), where \(\varphi\) denotes the other model parameter of the data distribution. However, such Maximum Likelihood (ML) approach is no longer applicable with \(\it{p}\gg \it{n}\). With Bayesian Lasso and Bayesian elastic net (EN) prior distribution on \(\boldsymbol{\beta}\), <code>EBglmnet</code> solves the problem by inferring a sparse posterior distribution for  \(\hat{\boldsymbol{\beta}}\), which includes exactly zero regression coefficients for irrelevant variables and both posterior mean and variance for non-zero ones. Comparing to the <code>glmnet</code> package implementing Lasso and EN method, not only does <code>EBglmnet</code> provide features including both sparse outcome and hypothesis testing, simulation study and real data analysis in the reference papers also demonstrated the better performance in terms of Power of Detection, False Discovery Rate, as well as Power Detecting Group Effects when applicable. While mathematically details of the <code>EBlasso</code> and <code>EBEN</code> methods can be found in the reference papers, the principle of the methods and differences on the prior distributions will be briefly introduced here.</p>
+
+<h3>Lasso and its Bayesian Interpretation</h3>
+
+<p>Lasso applies a penalty term on the log likelihood function and solve for \(\hat{\boldsymbol{\beta}}\) by maximizing the following penalized likelihood :</p>
+
+<p>\[
+\hat{\boldsymbol{\beta}} = \arg_{\boldsymbol{\beta}}\max\left[\log\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi) -\lambda||\boldsymbol{\beta}||_1\right],
+\]</p>
+
+<p>The \(\it{l_1}\) penalty term can be regarded as a mixture of hierarchical prior distribution:</p>
+
+<p>\[
+\beta_j  \sim \mathit{N}(0,\sigma_j^2),\
+\sigma_j^2  \sim \exp(\lambda), j = 1, \dots, p,
+\]</p>
+
+<p>and maximizing the penalized likelihood function is equivalent to maximize the marginal posterior distribution of \(\boldsymbol{\beta}\) :</p>
+
+<p>\[
+\hat{\boldsymbol{\beta}} = \arg_{\boldsymbol{\beta}}\max \log \mathit{p}(\boldsymbol{\beta}|\mathit{\boldsymbol{y}},\mathbf{X},\mu,\lambda, \varphi)\
+\approx\arg_{\boldsymbol{\beta}}\max \log\int\left[\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)\cdot (2\pi)^{-p/2}\lvert\mathbf{A}\rvert^{&frac12;}\exp\{-\frac{1}{2}\boldsymbol{\beta}^T\mathbf{A}\boldsymbol{\beta}\}\cdot \prod^p_{j=1}\lambda\exp\{-\lambda\sigma_j^2\}\right]d\boldsymbol{\sigma}^2,
+\]</p>
+
+<p>where \(\mathbf{A}\) is a diagonal matrix with \(\boldsymbol{\sigma}^{-2}\) on its diagonal. Of note, <code>lasso</code> integrates out the variance information \(\boldsymbol{\sigma}^2\) and estimates a posterior mode \(\hat{\boldsymbol{\beta}}\). The \(\it{l_1}\) penalty ensures a sparse solution can be achieved.</p>
+
+<h3>Empirical Bayesian Lasso (<code>EBlasso</code>)</h3>
+
+<p><code>EBglmnet</code> keeps the variance information integrated out in <code>lasso</code> while still enjoying the sparse property by taking a different and slightly complicated approach as showing below using <code>EBlasso-NE</code> as an example:</p>
+
+<p>In contrary to the marginalization on  \(\boldsymbol{\beta}\), the first step in <code>EBlasso-NE</code> is to obtain a marginal posterior distribution for  \(\boldsymbol{\sigma}^2\) :</p>
+
+<p>\[
+\mathit{p}(\boldsymbol{\sigma}^2|\mathit{\boldsymbol{y}},\mathbf{X},\mu,\lambda, \varphi) = \int\left[\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)\cdot (2\pi)^{-p/2}\lvert\mathbf{A}\rvert^{&frac12;}\exp\{-\frac{1}{2}\boldsymbol{\beta}^T\mathbf{A}\boldsymbol{\beta}\}\cdot \prod^p_{j=1}\lambda\exp\{-\lambda\sigma_j^2\} + c\right]d\boldsymbol{\beta},
+\]</p>
+
+<p>where \(c\) is a constant.
+While the integral in <code>lasso</code> is achieved through the conjugated normal + exponential (NE) prior, the integral in <code>EBlasso-NE</code> is completed through mixture of two normal distributions:  \(\it{p}\)(\(\boldsymbol{\beta}|\boldsymbol{\sigma}^2\)) and  \(\mathit{p}\)(\(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi\)), and the latter one typically is approximated to a normal distribution through Laplace approximation if itself is not a normal PDF. Then the estimate of \(\hat{\boldsymbol{\sigma}}^2\) can be obtained by maximizing this marginal posterior distribution, which has the following form:</p>
+
+<p>\[
+\hat{\boldsymbol{\sigma}}^2 = \arg_{\boldsymbol{\sigma}^2}\max \log \mathit{p}(\boldsymbol{\sigma}^2|\mathit{\boldsymbol{y}},\mathbf{X},\mu,\lambda, \varphi)\
+= \arg_{\boldsymbol{\sigma}^2}\max \left[
+\log\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\sigma}^2, \varphi,\lambda)-\sum^p_{j=1}\lambda\sigma_j^2 + c\right].
+\]</p>
+
+<p>Given the constraint that \(\boldsymbol{\sigma}^2 > 0\), the above equation is actually maximizing the \(\it{l_1}\) penalized marginal likelihood function of \(\boldsymbol{\sigma}^2\), which images the \(\it{l_1}\) penalty in <code>lasso</code> with the beauty of producing a sparse solution for \(\hat{\boldsymbol{\sigma}}^2\). Note that if \(\hat{\sigma_j}^2 = 0\), \(\hat{\beta_j}\) will also be zero and variable \(\mathit{x}_j\) will be excluded from the model.  Finally, With the sparse estimate of \(\hat{\boldsymbol{\sigma}}^2\), the posterior estimate of \(\hat{\boldsymbol{\beta}}\) and other nuance parameters can then be obtained accordingly.</p>
+
+<h3>Hierarchical Prior Distributions in <code>EBglmnet</code></h3>
+
+<h4>Prior 1: EBlasso-NE</h4>
+
+<p>\[
+\beta_j  \sim \mathit{N}(0,\sigma_j^2),\
+\sigma_j^2  \sim \exp(\lambda), j = 1, \dots, p
+\]</p>
+
+<p>As illustrated above, assuming a Normal + Exponential hierarchical prior distribution on \(\boldsymbol{\beta}\) (<code>EBlasso-NE</code>) will yield exactly the Lasso Prior. <code>EBlasso-NE</code> accommodates the properties of sparse solution and hypothesis testing given both the estimated mean and variance information in  \(\hat{\boldsymbol{\beta}}\) and \(\hat{\boldsymbol{\sigma}}^2\).  The NE prior is &ldquo;peak zero and flat tails&rdquo;, which can select variables with relatively small effect size while shrinking most of non-effects to exactly zero. <code>EBlasso-NE</code> can be applied to natural population analysis when effect sizes are relatively small.</p>
+
+<h4>Prior 2: EBlasso-NEG</h4>
+
+<p>In simulation and real data analysis, it is observed that the prior in <code>EBlasso-NE</code> has a relatively large probability mass on the nonzero tails, resulting in large number of non-zero small effects with large \(p-values\). We further developed another well studied conjugated hierarchical prior distribution under the empirical Bayesian framework, the Normal + Exponential + Gamma (NEG) prior:</p>
+
+<p>\[
+\beta_j  \sim \mathit{N}(0,\sigma_j^2),\
+\sigma_j^2  \sim \exp(\lambda), j = 1, \dots,p \
+\lambda \sim gamma(a,b)
+\]</p>
+
+<p>Comparing to <code>EBlasso-NE</code>, the NEG prior has a larger probability centered at 0, and will only yield nonzero regression coefficients for effects having relatively large signal to noise ratio. </p>
+
+<h4>Prior 3: Elastic Net Prior for Grouping Effect</h4>
+
+<p>Similar as <code>lasso</code>, <code>EBlasso</code> typically selects one variable out of a group of correlated variables. While <code>elastic net</code> was developed to encourage a grouping effect by incorporating an \(\it{l_2}\) penalty term, <code>EBglmnet</code> implemented an innovative <code>elastic net</code> hierarchical prior:</p>
+
+<p>\[
+\beta  \sim \mathit{N}\left[0,(\lambda_1 + \tilde{\sigma_j}^{-2})^{-1}\right], \
+\tilde{\sigma_j}^2  \sim generalized\ gamma(\lambda_1,\lambda_2), j = 1, \dots, p.
+\]</p>
+
+<p>The generalized gamma distribution has probability density function (PDF): \(f(\tilde{\sigma_j}^2|\lambda_1, \lambda_2) = c(\lambda_1\tilde{\sigma_j}^2 + 1)^{-&frac12;}\exp\{-\lambda_2\tilde{\sigma_j}^2\}, j=1,\dots,p\), with c being a normalization constant. The property of this prior can be appreciated from the following aspects:</p>
+
+<h5>(1): \(\lambda_1 = 0\)</h5>
+
+<p>When \(\lambda_1 = 0\) the generalized gamma distribution becomes an exponential distribution: \(f(\tilde{\sigma_j}^2|\lambda_2) = c\exp\{-\lambda_2\tilde{\sigma_j}^2\}, j=1,\dots,p\), with \(c= \lambda_2\), and the elastic net prior is reduced to the two level <code>EBlasso-NE</code> prior.</p>
+
+<h5>(2): \(\lambda_1 > 0\)</h5>
+
+<p>When \(\lambda_1 > 0\) the generalized gamma distribution can be written as a shift gamma distribution having the following PDF: \(f(\tilde{\sigma_j}^2|a,b,\gamma) = \frac{b^a}{\Gamma(a)}(\tilde{\sigma_j}^2 - \gamma)^{a-1}\exp\{-b(\tilde{\sigma_j}^2 - \gamma)\}\), where \(a=&frac12;, b = \lambda_2\), and \(\gamma = -1/\lambda_1\). In (Huang A. 2015), it is proved that the marginal prior distribution for \(\beta_j\) can be obtained as \(p(\beta_j)\propto\exp\{-\frac{\lambda_1}{2}\beta_j^2 - \sqrt{2\lambda_2}|\beta_j|\}\), which is equivalent with the <code>elastic net</code> method in <code>glmnet</code>.  </p>
+
+<h5>(3): structure of \(\boldsymbol{\sigma}^2\) and interpretation of the <code>elastic net</code> prior</h5>
+
+<p>Note that the prior variance for the regression coefficients has this form: \(\boldsymbol{\sigma}^2=\tilde{\boldsymbol{\sigma}}^{2}/(\lambda_1\tilde{\boldsymbol{\sigma}}^2+\mathit{\boldsymbol{I}})\). This structure seems counter intuitive at first glance. However, if we look at it from precision point of view, i.e., precision \(\boldsymbol{\alpha} = \boldsymbol{\sigma}^{-2}\), and \(\tilde{\boldsymbol{\alpha}} = \tilde{\boldsymbol{\sigma}}^{-2}\), then we have:</p>
+
+<p>\[
+\boldsymbol{\alpha} =\lambda_1\mathit{\boldsymbol{I}} +  \tilde{\boldsymbol{\alpha}}.
+\]</p>
+
+<p>The above equation demonstrates that we actually decompose the precision of the normal prior into a fixed component \(\lambda_1\) shared by all explanatory variables and a random component \(\tilde{\boldsymbol{\alpha}}\) that is unique for each explanatory variable. This design represents the mathematical balance between the inter-group independence and intra-group correlation among explanatory variables, and is aligned with the objective of sparseness while encouraging grouping effects.</p>
+
+<p>The empirical Bayesian elastic net (EBEN) in <code>EBglmnet</code> is solved similar as <code>EBlasso</code> using the aforementioned empirical Bayesian approach. Research studies presented in the reference papers demonstrated that <code>EBEN</code> has better performance comparing with <code>elastic net</code> in terms of Power of Detection, False Discovery Rate, and most importantly, Power of Detecting Groups. </p>
+
+<h3><code>EBglmnet</code> Implementation and Usage</h3>
+
+<p>The <code>EBglmnet</code> algorithms use greedy coordinate descent, which successively optimizes the objective function over each parameter with others fixed, and cycles repeatedly until convergence. Key algorithms are implemented in C/C++ with matrix computation using the BLAS/LAPACK packages.  Due to closed form solutions for \(\hat{\boldsymbol{\sigma}}^2\) in all prior setups and other algorithmic and programming techniques, the algorithms can compute the solutions very fast.</p>
+
+<p>We recommend to use <code>EBlasso-NEG</code> when there are a large number of candidate effects (eg. \(\ge 10^6\) number of effects such as whole-genome epistasis analysis and GWAS), and use <code>EBEN</code> when there are groups of highly correlated variables.</p>
+
+<p>The authors of <code>EBglmnet</code> are Anhui Huang  and Dianting Liu. This vignette describes the principle and usage of <code>EBglmnet</code> in R. Users are referred to the papers in the reference section for details of the algorithms.</p>
+
+<p><a id="install"></a></p>
+
+<h2>Installation</h2>
+
+<p>With Admin Permission on PC, <code>EBglmnet</code> can be installed directly from CRAN using the following command in R console:</p>
+
+<pre><code class="r">install.packages(&quot;EBglmnet&quot;, repos = &quot;http://cran.us.r-project.org&quot;)
+</code></pre>
+
+<p>which will download and install the package to the default directories. When Admin Permission is not immediately available, users can download the pre-compiled binary file at <a href="http://cran.r-project.org/web/packages/EBglmnet/index.html">http://cran.r-project.org/web/packages/EBglmnet/index.html</a>, and install it from local package.</p>
+
+<p><a href="#top">Back to Top</a></p>
+
+<p><a id="qs"></a></p>
+
+<h2>Quick Start</h2>
+
+<p>We will give users a general idea of the package by using a simple example that demonstrates the basis package usage. Through running the main functions and examining the outputs, users may have a better idea on how the package works, what functions are available, which parameters to choose, as well as where to seek help. More details are given in later sections.</p>
+
+<p>Let us first clear up the workspace and load the <code>EBglmnet</code> package:</p>
+
+<pre><code class="r">rm(list = ls())
+set.seed(1)
+library(EBglmnet)
+</code></pre>
+
+<p>We will use an R built-in dataset <code>state.x77</code> as an example, which includes a matrix with 50 rows and 8 columns giving the following measurements in the respective columns: Population, Income, Illiteracy, Life Expectancy, Murder Rate, High School Graduate Rate, Days Below Freezing Temperature, and Land Area. The default model used in the package is the Gaussian linear model, and we will demonstrate it using Life Expectancy as the response variable and the remaining as explanatory variables. We create the input data as shown below, and users can load their own data and prepare variable <code>y</code> and <code>x</code> following this example.</p>
+
+<pre><code class="r">varNames = colnames(state.x77);
+varNames
+</code></pre>
+
+<pre><code>## [1] &quot;Population&quot; &quot;Income&quot;     &quot;Illiteracy&quot; &quot;Life Exp&quot;   &quot;Murder&quot;    
+## [6] &quot;HS Grad&quot;    &quot;Frost&quot;      &quot;Area&quot;
+</code></pre>
+
+<pre><code class="r">y= state.x77[,&quot;Life Exp&quot;]
+xNames = c(&quot;Population&quot;,&quot;Income&quot;,&quot;Illiteracy&quot;, &quot;Murder&quot;,&quot;HS Grad&quot;,&quot;Frost&quot;,&quot;Area&quot;)
+x = state.x77[,xNames]
+</code></pre>
+
+<p>We fit the model using the most basic call to  <code>EBglmnet</code> with default prior</p>
+
+<pre><code class="r">output = EBglmnet(x,y,hyperparameters = c(0.1, 0.1))
+</code></pre>
+
+<p>&ldquo;output&rdquo; is a list containing all the relevant information of the fitted model. Users can examine the output by directly looking at each elements in the list. Particularly, the sparse regression coefficients can be extracted as shown below:</p>
+
+<pre><code class="r">glmfit = output$fit
+variables = xNames[glmfit[,1,drop=FALSE]]
+cbind(variables,as.data.frame(round(glmfit[,3:6,drop=FALSE],4)))
+</code></pre>
+
+<pre><code>##   variables    beta posterior variance t-value p-value
+## 1    Murder -0.2716              2e-04 19.1011       0
+</code></pre>
+
+<p>The hyperparameters in each of the prior distributions control the number of non-zero effects to be selected, and  Cross-validation is perhaps the simplest and most widely used method in deciding their values. <code>cv.EBglmnet</code> is the main function to do cross-validation, which can be called using the following code.</p>
+
+<pre><code class="r">cvfit = cv.EBglmnet(x, y)
+</code></pre>
+
+<pre><code>## EBLASSO Linear Model, NEG prior,Epis:  FALSE ; 5 fold cross-validation
+</code></pre>
+
+<p><code>cv.EBglmnet</code> returns a <code>cv.EBglmnet</code> object, which is a list with all the ingredients of the CV and the final fit results using CV selected optimal hyperparameters. We can view the CV results, selected hyperparameters and the corresponding coefficients. For example, CV using different hyperparameters and the corresponding prediction errors are shown below:</p>
+
+<pre><code class="r">cvfit$CrossValidation
+</code></pre>
+
+<pre><code>##           a    b Mean Square Error standard error
+##  [1,]  0.01 0.01          6.946057      0.9700985
+##  [2,]  0.05 0.05          7.176659      1.0210269
+##  [3,]  0.10 0.10          7.119028      0.9301902
+##  [4,]  0.50 0.50          7.231957      1.0309335
+##  [5,]  1.00 1.00          7.272872      1.0584536
+##  [6,] -0.01 0.01          7.040761      1.0591568
+##  [7,] -0.10 0.01          6.870634      0.9430769
+##  [8,] -0.20 0.01          6.794398      1.0186088
+##  [9,] -0.30 0.01          6.773458      1.0003535
+## [10,] -0.40 0.01          6.872662      0.9613271
+## [11,] -0.50 0.01          6.640368      0.9081789
+## [12,] -0.60 0.01          6.674869      0.9010741
+## [13,] -0.70 0.01          6.488512      0.9181083
+## [14,] -0.80 0.01          6.783028      0.8528925
+## [15,] -0.90 0.01          8.593017      2.6622512
+## [16,] -0.70 0.05          6.607755      0.8973462
+## [17,] -0.70 0.10          6.604372      0.7756307
+## [18,] -0.70 0.50          8.365123      2.5094444
+</code></pre>
+
+<p>The selected parameters and the corresponding fitting results:</p>
+
+<pre><code class="r">cvfit$hyperparameters
+</code></pre>
+
+<pre><code>##     a     b 
+## -0.70  0.01
+</code></pre>
+
+<pre><code class="r">cvfit$fit
+</code></pre>
+
+<pre><code>##      locus1 locus2        beta posterior variance  t-value      p-value
+## [1,]      4      4 -0.24209575       6.457118e-04 9.527255 9.798828e-13
+## [2,]      5      5  0.03364319       1.515986e-05 8.640711 2.036082e-11
+</code></pre>
+
+<p><a href="#top">Back to Top</a></p>
+
+<p><a id="glm"></a></p>
+
+<h2>GLM Family</h2>
+
+<p>Two families of models have been developed in <code>EBglmnet</code>, the  <code>gaussian</code> family and the <code>binomial</code> family, which are essentially different probability distribution assumptions on the response variable <code>y</code>.</p>
+
+<h3>Gaussian Model</h3>
+
+<p><code>EBglmnet</code> assumes a Gaussian distribution on <code>y</code> by default, i.e., \(\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi) = N( \mu\mathit{\boldsymbol{I}} + \mathbf{X}\boldsymbol{\beta}, \sigma_0^2\boldsymbol{I})\), where \(\varphi= \sigma_0^2\) is the residual variance. In the above example, both \(\hat{\mu}\) and \(\hat{\sigma_0}^2\) are listed in the output: </p>
+
+<pre><code class="r">output$Intercept
+</code></pre>
+
+<pre><code>## [1] 72.88376
+</code></pre>
+
+<pre><code class="r">output$residual
+</code></pre>
+
+<pre><code>## [1] 0.6912821
+</code></pre>
+
+<h3>Binomial Model</h3>
+
+<p>If there are two possible outcomes in the response variable, a binomial distribution assumption on <code>y</code> is available in <code>EBglmnet</code>, which has \(\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)\) following a binomial distribution and \(\varphi\in\emptyset\). Same as the widely-used logistic regression model, the link function is \(\eta_i = logit(p_i)=\log(\frac{Pr(y_i)=1}{1-Pr(y_i=1)}), i = 1, \dots, n\). To run <code>EBglmnet</code> with binomial models, users need to specify the parameter <code>family</code> as <code>binomial</code>:</p>
+
+<pre><code class="r">yy = y&gt;mean(y);
+output = EBglmnet(x,yy,family=&quot;binomial&quot;, hyperparameters = c(0.1, 0.1))
+</code></pre>
+
+<p>For illustration purpose, the above codes created a binary variable <code>yy</code> by set the cutoff at the mean Life Expectancy value. </p>
+
+<p><a href="#top">Back to Top</a></p>
+
+<p><a id="prior"></a></p>
+
+<p>##Prior, Hyperparameters and Epistasis</p>
+
+<p>The three sets of hierarchical prior distribution can be specified by <code>prior</code> option in <code>EBglmnet</code>. By default, <code>EBglmnet</code> assumes the <code>lassoNEG</code> prior, to change to other priors:</p>
+
+<pre><code class="r">output = EBglmnet(x,yy,family=&quot;binomial&quot;, prior = &quot;elastic net&quot;, hyperparameters = c(0.1, 0.1))
+</code></pre>
+
+<p>Note that the hyperparameters setup is associated with a specific prior. In <code>lasso</code> prior, only one hyperparameter \(\lambda\) is required, while in <code>elastic net</code> and <code>lassoNEG</code>, two hyperparameters need to be specified. For <code>EBEN</code> having the <code>elastic net</code> prior distribution, the two hyperparameters \(\lambda_1\) and \(\lambda_2\) are defined in terms of other two parameters \(\alpha \in [0,1]\) and \(\lambda>0\) same as in <code>glmnet</code> package, such that \(\lambda_1 = (1-\alpha)\lambda\) and  \(\lambda_2 = \alpha\lambda\). Therefore, users are asked to specify \(hyperparameters=c(\alpha, \lambda)\). </p>
+
+<p>In genetic and population analysis, sometimes it is interested in analyzing the interaction terms among the variables. <code>EBglmnet</code> provides a feature that can incorporate all pair-wise interactions into analysis, which is achieved by setting <code>Epis</code> as <code>TRUE</code>:</p>
+
+<pre><code class="r">output = EBglmnet(x,yy,family=&quot;binomial&quot;, prior = &quot;elastic net&quot;, hyperparameters = c(0.1, 0.1),Epis = TRUE)
+output$fit
+</code></pre>
+
+<pre><code>##      locus1 locus2          beta posterior variance   t-value    p-value
+## [1,]      4      4 -5.318341e-02       1.491454e-03 1.3771184 0.17473457
+## [2,]      1      7  1.719555e-10       5.184252e-20 0.7552192 0.45373244
+## [3,]      2      4 -8.894085e-06       6.408661e-11 1.1110091 0.27198645
+## [4,]      3      4 -3.785224e-02       4.632023e-04 1.7587586 0.08486232
+## [5,]      4      5 -3.100472e-04       2.447304e-07 0.6267348 0.53374233
+## [6,]      4      6 -4.688616e-04       1.273471e-07 1.3138633 0.19501041
+</code></pre>
+
+<p>When <code>Epis = TRUE</code>, both \(p\) number of main effects and \(p(p-1)/2\) number of interaction effects are considered in the model. In the output, <code>locus1</code> and <code>locus2</code> denote the pair of interaction variables, and if the numbers are the same, the corresponding effect is from a main effect.  Users should be aware of the significant larger number variables considered (i.e., \(p(p-1)/2\) more variables), and <code>EBglmnet</code> will need longer time when \(p\) is large for the program to finish the computation.</p>
+
+<p><a href="#top">Back to Top</a></p>
+
+<h2>References</h2>
+
+<p>Anhui Huang, Shizhong Xu and Xiaodong Cai. (2015). <br>
+<a href="http://www.nature.com/hdy/journal/v114/n1/full/hdy201479a.html/">Empirical Bayesian elastic net for multiple quantitative trait locus mapping</a><br>
+<em>Heredity</em>, Vol. 114(1), 107-115.</p>
+
+<p>Anhui Huang, Shizhong Xu and Xiaodong Cai. (2014a).<br>
+<a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0087330/">Whole-genome quantitative trait locus mapping reveals major role of epistasis on yield of rice</a><br>
+<em>PLoS ONE</em>, Vol. 9(1) e87330.</p>
+
+<p>Anhui Huang, Eden Martin, Jeffery Vance, and Xiaodong Cai (2014b).<br>
+<a href="http://onlinelibrary.wiley.com/doi/10.1002/gepi.21803/abstract?userIsAuthenticated=false&deniedAccessCustomisedMessage=/">Detecting genetic interactions in pathway-based genome-wide association studies</a><br>
+<em>Genetic Epidemiology</em>, 38(4), 300-309.</p>
+
+<p> Anhui Huang, Shizhong Xu and Xiaodong Cai. (2013). <br>
+<a href="http://www.biomedcentral.com/1471-2156/14/5">Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping </a><br>
+<em>BMC Genetics</em>, 14(1),5.</p>
+
+<p>Xiaodong Cai, Anhui Huang and Shizhong Xu (2011). <br>
+<a href="http://www.biomedcentral.com/1471-2105/12/211">Fast empirical Bayesian LASSO for multiple quantitative trait locus mapping </a><br>
+<em>BMC Bioinformatics</em>, 12(1),211.</p>
+
+</body>
+
+</html>

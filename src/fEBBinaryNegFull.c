@@ -59,6 +59,8 @@ void fEBBinaryFull(double *BASIS, double * Targets, double *a_gamma, double * b_
 	if(verbose >1) Rprintf("start EBLasso-NEG with a: %f, \tb: %f\n",a_gamma[0], b_gamma[0]);
 //------------------------------------------------------------	
 	int basisMax			= *bMax;
+	int basisMax_io 		= *bMax;
+	if(K>=100) basisMax 	= 10*K;
 //------------------------------------------------------------	
 
 	if(verbose >1) Rprintf("M_full: %d; basisMax: %d\n",M_full,basisMax);
@@ -100,10 +102,10 @@ void fEBBinaryFull(double *BASIS, double * Targets, double *a_gamma, double * b_
 			kk++;
 		}
 	}
-	readPtr1 				= &Beta[basisMax*2];
-	F77_CALL(dcopy)(&basisMax,&zero_blas,&inc0,readPtr1,&inci);  //dcopy(n, x, incx, y, incy) ---> y = x
-	readPtr1 				= &Beta[basisMax*3];
-	F77_CALL(dcopy)(&basisMax,&zero_blas,&inc0,readPtr1,&inci);  //dcopy(n, x, incx, y, incy) ---> y = x
+	readPtr1 				= &Beta[basisMax_io*2];
+	F77_CALL(dcopy)(&basisMax_io,&zero_blas,&inc0,readPtr1,&inci);  //dcopy(n, x, incx, y, incy) ---> y = x
+	readPtr1 				= &Beta[basisMax_io*3];
+	F77_CALL(dcopy)(&basisMax_io,&zero_blas,&inc0,readPtr1,&inci);  //dcopy(n, x, incx, y, incy) ---> y = x
 		
 	//
 	int iter				= 0;
@@ -173,7 +175,7 @@ void fEBBinaryFull(double *BASIS, double * Targets, double *a_gamma, double * b_
 			if(index<K)
 			{
 				Beta[kk] 	= index + 1;
-				Beta[basisMax+kk] 	= index + 1;		
+				Beta[basisMax_io+kk] 	= index + 1;		
 			}else //compute i,j
 			{
 				l = index;
@@ -188,12 +190,12 @@ void fEBBinaryFull(double *BASIS, double * Targets, double *a_gamma, double * b_
 					}
 				}
 				Beta[kk] = locus1 +1;
-				Beta[basisMax+kk] = locus2  +1;	
+				Beta[basisMax_io+kk] = locus2  +1;	
 			
 			}		
 			scal = (double)Scales[index];
-			Beta[basisMax*2 + kk]	= Mu2[i]/scal;
-			Beta[basisMax*3 + kk]  = SIGMA2[i*M + i]/(scal*scal);
+			Beta[basisMax_io*2 + kk]	= Mu2[i]/scal;
+			Beta[basisMax_io*3 + kk]  = SIGMA2[i*M + i]/(scal*scal);
 			kk = kk + 1;
 		}
 
@@ -435,7 +437,7 @@ void fEBBinaryMexBfNeg(int *Used, double *Mu2, double *SIGMA2, double *H2, doubl
 			//Rprintf("\t\t newAlpha: %f\n",newAlpha);
             // B_phi*PHI2*SIGMA2        tmp = B_phi*PHI2 
             index					= N_used + 1;
-			if(index > (basisMax -10)) {
+			if(index > (basisMax -10)&& (N*K) > 1e7) {
 				Rprintf("bases: %d, warning: out of Memory, alloc more to Neffect!\n",index);
 			}
             for(i=0;i<index;i++)

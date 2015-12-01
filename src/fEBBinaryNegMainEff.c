@@ -356,7 +356,7 @@ void fEBBinaryMexBmNeg(int *Used, double *Mu2, double *SIGMA2, double *H2, doubl
 			//Rprintf("\t\t newAlpha: %f\n",newAlpha);
             // B_phi*PHI2*SIGMA2        tmp = B_phi*PHI2 
             index					= N_used + 1;
-			if(index > (basisMax -10)) {
+			if(index > (basisMax -10) && (N*K) > 1e7) {
 				Rprintf("bases: %d, warning: out of Memory, alloc more to Neffect!\n",index);
 			}//return;
             for(i=0;i<index;i++)

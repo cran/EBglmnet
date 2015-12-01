@@ -383,7 +383,7 @@ if(verbose >3) Rprintf("check point 3: before loop \n");
 		fEBDeltaMLGfNeEN(DeltaML, Action, AlphaRoot,anyToDelete,Used, Unused, S_out, Q_out, Alpha,
 				a_lambda, b_Alpha,M, N_unused);
 		//
-        deltaLogMarginal			= 0;
+        deltaLogMarginal			= 0.001;
         nu							= -1;
         for(i=0;i<M_full;i++)
         {
@@ -511,10 +511,10 @@ if(verbose >3) Rprintf("check point 3: before loop \n");
 			//Rprintf("\t\t newAlpha: %f\n",newAlpha);
             // B_phi*PHI2*SIGMA2        tmp = B_phi*PHI2 
             index					= M + 1;
-			if(index > (basisMax -10) && iter>1) {
+			if(index > (basisMax -10) && iter>1 &&(N*K) > 1e7) {
 				Rprintf("bases: %d, warning: out of Memory!\n",index);
 			}//return;
-			if(index > (basisMax -1) && iter>1) {
+			if(index > (basisMax -1) && iter>1 && (N*K) > 1e7 ) {
 				Rprintf("bases: %d, out of Memory,exiting program!\n",index);
 				//exit(1);			
 			}

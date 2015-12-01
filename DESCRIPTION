@@ -2,14 +2,16 @@ Package: EBglmnet
 Type: Package
 Title: Empirical Bayesian Lasso and Elastic Net Methods for Generalized
         Linear Models
-Version: 3.6
-Date: 2014-12-13
+Version: 4.0
+Date: 2015-11-30
 Author: Anhui Huang
 Maintainer: Anhui Huang <a.huang1@umiami.edu>
-Description: Empirical Bayesian Lasso and Elastic Net algorithms are variable selection and effect estimation methods that outperform other popular methods such as Lasso and Elastic Net methods.
+Suggests: knitr
+Description: Provides Empirical Bayesian Lasso and Elastic Net algorithms for variable selection and effect estimation. Key features include sparse variable selection and effect estimation via generalized linear regression models, high dimensionality with p>>n, and significant test for nonzero effects. This package outperforms other popular methods such as Lasso and Elastic Net methods in terms of Power of Detection, False Discovery Rate, and Power of Detection Grouping Effects.
 License: GPL
-Packaged: 2014-12-14 15:47:48 UTC; Anhui
-Depends: R (>= 2.10)
+VignetteBuilder: knitr
+URL: https://sites.google.com/site/anhuihng/programming
 NeedsCompilation: yes
 Repository: CRAN
-Date/Publication: 2014-12-14 18:23:28
+Packaged: 2015-12-01 02:50:13 UTC; Anhui
+Date/Publication: 2015-12-01 08:01:04
