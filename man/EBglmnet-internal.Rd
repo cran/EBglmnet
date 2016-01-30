@@ -10,6 +10,9 @@
 \alias{EBlassoNEG.Gaussian}
 \alias{EBlassoNEG.BinomialCV}
 \alias{EBlassoNEG.GaussianCV}
+\alias{ijIndex}
+\alias{CVonePair}
+\alias{lambdaMax}
 \description{Internal EBglmnet functions}
 \usage{
 	EBelasticNet.Binomial(BASIS,Target, lambda, alpha,Epis,verbose)
@@ -22,6 +25,9 @@
 	EBlassoNEG.BinomialCV(BASIS,Target,nFolds,foldId,Epis,verbose,group)
 	EBlassoNEG.Gaussian(BASIS,Target,a_gamma, b_gamma, Epis, verbose, group)
 	EBlassoNEG.GaussianCV(BASIS,Target,nFolds,foldId,Epis,verbose,group)
+	ijIndex(trueLoc,K)
+	CVonePair(X,y,nFolds,foldId,hyperpara,Epis,prior,family,verbose,group)
+	lambdaMax(X,y,Epis)
 }
 \author{Anhui Huang and Dianting Liu \cr Dept of Electrical and Computer Engineering, Univ of Miami, Coral Gables, FL}
 
@@ -36,5 +42,8 @@
 	\code{EBlassoNEG.BinomialCV}Cross Validation designed with 3-step search for EBlasso-NEG binomial model.
 	\code{EBlassoNEG.Gaussian} fits sparse linear regression using lasso-NEG prior distribution. 
 	\code{EBlassoNEG.GaussianCV}Cross Validation designed with 3-step search for EBlasso-NEG Gaussian model.
+	\code{ijIndex}Function for looking at the pair of interaction terms.
+	\code{CVonePair}Function performs nFolds CV for the given one pair of hyperparameter.	
+	\code{lambdaMax}Function calculate the maximum lambda for EBlasso-NE and EBEN in CV.
 }
 \keyword{internal}

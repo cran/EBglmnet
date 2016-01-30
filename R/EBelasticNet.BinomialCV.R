@@ -1,7 +1,7 @@
 EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0)
 {
-
-	cat("EBEN Logistic Model, NE prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	nStep = 19;
+	cat("EBEN Logistic Model,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
 	#set.seed(proc.time())
@@ -13,78 +13,43 @@ EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbos
 			foldId 			= sample(rep(1:nFolds,floor(N/nFolds)),N);
 		}
 	}
-	lambda_Max			= log(1.1);
-	ynorm 				= sqrt(sum(Target*Target));
-	ynormal 			= Target/ynorm;
-	
-	for(i_b in 1:K){
-		basis 			= BASIS[,i_b];
-		basis 			= basis/sqrt(sum(basis*basis));
-		corBy 			= basis%*%ynormal;
-		if(corBy>lambda_Max) lambda_Max = corBy;
-	}	
-	if(Epis){
-		for(i_b in 1:(K-1)){
-			for(i_bj in (i_b + 1):K){
-				basis 	= BASIS[,i_b]*BASIS[,i_bj];
-				basis 	= basis/sqrt(sum(basis*basis));
-				corBy 	= basis%*%ynormal;
-				if(corBy>lambda_Max) lambda_Max = corBy;
-			}
-		}		
-	}
-	lambda_Max 			= lambda_Max;
+	lambda_Max = lambdaMax(BASIS,Target,Epis);
+
 	lambda_Min 			= log(0.001*lambda_Max);
-	step 				= (log(lambda_Max) - lambda_Min)/20;
-	Lambda 				= exp(seq(from = lambda_Min,to=log(lambda_Max),by=step))
+	step 				= (log(lambda_Max) - lambda_Min)/nStep;
+	Lambda 				= exp(seq(from = log(lambda_Max),to=lambda_Min,by= -step))
 	N_step 				= length(Lambda);
 
-
 	step 				= 1;
-	Alpha 				= seq(from = 1, to = 0.1, by = -0.1)
+	Alpha 				=  seq(from = 0.9, to = 0.1, by = -0.1)
 	nAlpha 				= length(Alpha);
 		
 	Likelihood 			= mat.or.vec((N_step*nAlpha),4);
-	logL 				= mat.or.vec(nFolds,1);
+	#logL 				= mat.or.vec(nFolds,1);
+	logL1alpha			= matrix(0,N_step,2);# temp matrix to keep MSE + std in each step
+
+	nLogL = rep(0,4);
+	pr = "elastic net"; #1LassoNEG; 2: lasso; 3EN
+	model = "binomial";#0linear; 1 binomial
+	group = 0;
 	for(i_alpha in 1:nAlpha){
 		alpha 			= Alpha[i_alpha];
 		if(verbose >=0) cat("Testing alpha", i_alpha, "/",nAlpha,":\t\talpha: ",alpha,"\t")
 		for (i_s in 1:N_step){
 			
 			lambda 		= Lambda[i_s];
+			
+			hyperpara = c(alpha, lambda);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL[3] = -logL[3]; #C produces negative logL;
+			Likelihood[step,] = logL;
+			logL1alpha[i_s,] 	= logL[3:4];
 
-	#cat("\tTesting step", step, "\t\tlambda: ",lambda,"\n")
-			for(i in 1:nFolds){
-				index  			= which(foldId!=i);
-				Basis.Train 	= BASIS[index,];
-				Target.Train 	= Target[index];
-				index  			= which(foldId == i);
-				Basis.Test  	= BASIS[index,];
-				Target.Test 	= Target[index];
-				SimF2fEB 		<-EBelasticNet.Binomial(Basis.Train,Target.Train,lambda,alpha,Epis, verbose);
-				M				= length(SimF2fEB$fit)/6;
-				Betas 			<- matrix(SimF2fEB$fit,nrow= M,ncol =6, byrow= FALSE);
-				Mu  			= Betas[,3];
-				Mu0 			= SimF2fEB$Intercept[1];
-				
-				rm(list="SimF2fEB");
-				ntest 			= nrow(Basis.Test);
-				#M 		= nrow(Betas);
-				basisTest 	= matrix(rep(0,ntest*M),ntest,M);
-				for(i_basis in 1:M){
-					loc1 = Betas[i_basis,1];
-					loc2 = Betas[i_basis,2];
-					if(loc1==loc2){ 	basisTest[,i_basis] =  Basis.Test[,loc1];}
-					else{			basisTest[,i_basis] =  Basis.Test[,loc1]* Basis.Test[,loc2];}
-				}
-				temp 		= exp(Mu0 + basisTest%*%Mu);
-				logL[i] 	= mean(Target.Test*log(temp/(1+temp)) + (1-Target.Test)*log(1/(1+temp)));
-			}
-			Likelihood[step,] = c(alpha, lambda,mean(logL),sd(logL));
-			if(verbose >=0) cat("lambda:",lambda,"\t log Likelihood",mean(logL),"\n");
 			step 			= step + 1;
 		}
-		
+		index = which.max(logL1alpha[,1]);
+		lambda= Lambda[index];
+		if(verbose >=0) cat("lambda:",lambda,"\t max log Likelihood",logL1alpha[index,1],"\n");		
 	}
 	colnames(Likelihood) = c("alpha","lambda","logLikelihood","standard error");
 	index 				= which.max(Likelihood[,3]);

@@ -22,41 +22,25 @@ EBlassoNEG.BinomialCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose =
 	Likelihood 		= mat.or.vec(N_step,4);
 	logL 			= mat.or.vec(nFolds,1);
 	stp 			 = 1;
+	
+	nLogL = rep(0,4);
+	pr = "lassoNEG"; #1LassoNEG; 2: lasso; 3EN
+	model = "binomial";#0linear; 1 binomial alpha
+
+	
 	#------------------------------------------ step one ----------------------------------
 	for (i_s1 in 1:N_step1){		
 		a_gamma 			= a_r1[i_s1];
 		b_gamma 			= b_r1[i_s1];
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
-		for(i in 1:nFolds){
-			index  			= which(foldId!=i);
-			Basis.Train 	= BASIS[index,];
-			Target.Train 	= Target[index];
-			index  			= which(foldId == i);
-			Basis.Test  	= BASIS[index,];
-			Target.Test 	= Target[index];			
-			SimF2fEB 		<-EBlassoNEG.Binomial(Basis.Train,Target.Train,a_gamma,b_gamma,Epis,verbose, group);			
-			M				= length(SimF2fEB$fit)/6;
-			Betas 			<- matrix(SimF2fEB$fit,nrow= M,ncol =6, byrow= FALSE);
-			Mu  			= Betas[,3];
-			Mu0 			= SimF2fEB$Intercept[1];			
-			rm(list="SimF2fEB");
-			ntest 			= nrow(Basis.Test);
-			#M 				= nrow(Betas);
-			basisTest 		= matrix(rep(0,ntest*M),ntest,M);
-			for(i_basis in 1:M){
-				loc1 		= Betas[i_basis,1];
-				loc2 		= Betas[i_basis,2];				
-				if(loc1!=0 &&loc2!=0)
-				{
-					if(loc1==loc2){ 	basisTest[,i_basis] =  Basis.Test[,loc1];}
-					else{			basisTest[,i_basis] =  Basis.Test[,loc1]* Basis.Test[,loc2];}
-				}
-			}
-			temp 			= exp(Mu0 + basisTest%*%Mu);
-			logL[i] 		= mean(Target.Test*log(temp/(1+temp)) + (1-Target.Test)*log(1/(1+temp)));
-		}
-		if(verbose >=0) cat("log likelihood: ",mean(logL),"\n");
-		Likelihood[stp,] 	= c(a_gamma,b_gamma,mean(logL),sd(logL)/sqrt(nFolds));
+		
+			hyperpara = c(a_gamma, b_gamma);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL[3] = -logL[3]; #C produces negative logL;
+	
+
+		if(verbose >=0) cat("log likelihood: ",logL[3],"\n");
+		Likelihood[stp,] 	= logL;
 		stp 				= stp + 1;
 	}	
 	index		 			= which.max(Likelihood[1:N_step1,3]);
@@ -71,33 +55,14 @@ N_step2 = length(a_rS2)
 	for(i_s2 in 1:N_step2){
 		a_gamma 			= a_rS2[i_s2];
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
-		for(i in 1:nFolds){
-			index  			= which(foldId!=i);
-			Basis.Train 	= BASIS[index,];
-			Target.Train 	= Target[index];
-			index  			= which(foldId == i);
-			Basis.Test  	= BASIS[index,];
-			Target.Test 	= Target[index];			
-			SimF2fEB 		<-EBlassoNEG.Binomial(Basis.Train,Target.Train,a_gamma,b_gamma,Epis,verbose, group);
-			M				= length(SimF2fEB$fit)/6;
-			Betas 			<- matrix(SimF2fEB$fit,nrow= M,ncol =6, byrow= FALSE);
-			Mu  			= Betas[,3];
-			Mu0 			= SimF2fEB$Intercept[1];
-			rm(list = "SimF2fEB");
-			ntest 			= nrow(Basis.Test);
-			#M 				= nrow(Betas);
-			basisTest 		= matrix(rep(0,ntest*M),ntest,M);
-			for(i_basis in 1:M){
-				loc1 		= Betas[i_basis,1];
-				loc2 		= Betas[i_basis,2];
-				if(loc1==loc2){ 	basisTest[,i_basis] =  Basis.Test[,loc1];}
-				else{			basisTest[,i_basis] =  Basis.Test[,loc1]* Basis.Test[,loc2];}
-			}
-			temp 			= exp(Mu0 + basisTest%*%Mu);
-			logL[i] 		= mean(Target.Test*log(temp/(1+temp)) + (1-Target.Test)*log(1/(1+temp)));
-		}
-		if(verbose >=0) cat("log likelihood: ",mean(logL),"\n");
-		Likelihood[stp,] 	= c(a_gamma,b_gamma,mean(logL),sd(logL)/sqrt(nFolds));
+		
+		hyperpara = c(a_gamma, b_gamma);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);	
+			logL[3] = -logL[3]; #C produces negative logL;
+		
+	
+		if(verbose >=0) cat("log likelihood: ",logL[3],"\n");
+		Likelihood[stp,] 	= logL;
 		currentL			= Likelihood[stp,3];
 		stp 				= stp + 1;		
 		# break out of 2nd step
@@ -125,33 +90,11 @@ N_step2 = length(a_rS2)
 	for(i_s3 in 1:N_step3){
 		b_gamma 			= b_rS2[i_s3];
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
-		for(i in 1:nFolds){
-			index  			= which(foldId!=i);
-			Basis.Train 	= BASIS[index,];
-			Target.Train 	= Target[index];
-			index  			= which(foldId == i);
-			Basis.Test  	= BASIS[index,];
-			Target.Test 	= Target[index];			
-			SimF2fEB 		<-EBlassoNEG.Binomial(Basis.Train,Target.Train,a_gamma,b_gamma,Epis,verbose, group);
-			M				= length(SimF2fEB$fit)/6;
-			Betas 			<- matrix(SimF2fEB$fit,nrow= M,ncol =6, byrow= FALSE);
-			Mu  			= Betas[,3];
-			Mu0 			= SimF2fEB$Intercept[1];
-			rm(list = "SimF2fEB");
-			ntest 			= nrow(Basis.Test);
-			#M 				= nrow(Betas);
-			basisTest 		= matrix(rep(0,ntest*M),ntest,M);
-			for(i_basis in 1:M){
-				loc1 		= Betas[i_basis,1];
-				loc2 		= Betas[i_basis,2];
-				if(loc1==loc2){ 	basisTest[,i_basis] =  Basis.Test[,loc1];}
-				else{			basisTest[,i_basis] =  Basis.Test[,loc1]* Basis.Test[,loc2];}
-			}
-			temp 			= exp(Mu0 + basisTest%*%Mu);
-			logL[i] 		= mean(Target.Test*log(temp/(1+temp)) + (1-Target.Test)*log(1/(1+temp)));
-		}
-		if(verbose >=0) cat("log likelihood: ",mean(logL),"\n");
-		Likelihood[stp,] 	= c(a_gamma,b_gamma,mean(logL),sd(logL)/sqrt(nFolds));
+		hyperpara = c(a_gamma, b_gamma);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);		
+
+		if(verbose >=0) cat("log likelihood: ",logL[3],"\n");
+		Likelihood[stp,] 	= logL;
 		currentL			= Likelihood[stp,3];
 		stp 				= stp + 1;		
 		# break out of 3rd step
