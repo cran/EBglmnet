@@ -13,7 +13,7 @@
 \usage{
 cv.EBglmnet(x, y, family=c("gaussian","binomial"),
 		prior= c("lassoNEG","lasso","elastic net"), nfolds=5, 
-		foldId, Epis = FALSE, group = FALSE, verbose = 0)
+		foldId, verbose = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -33,19 +33,6 @@ cv.EBglmnet(x, y, family=c("gaussian","binomial"),
   \item{foldId}{an optional vector of values between 1 and \code{nfolds}
     identifying which fold each observation is assigned to. If not supplied, each of the \code{n} samples will be 
 	assigned to the \code{nfolds} randomly.} 
-  \item{Epis}{Boolean parameter for including two-way interactions. By default, \code{Epis = FALSE}. When
-  \code{Epis = TRUE}, EBglmnet will take all pair-wise interaction effects into consideration. EBglmnet does not 
-  create a giant matrix for all the \code{p(p+1)/2} effects. Instead, it dynamically allocates the memory for the 
-  nonzero effects identified in the model, and reads the corresponding variables from the original input matrix 
-  \code{x}.}
-  \item{group}{Boolean parameter for \code{group EBlasso} (currently only available for the \code{"lassoNEG"} 
-  prior). This parameter is only valid when \code{Epis = TRUE}, 
-	and is set to \code{FALSE} by default. When \code{Epis = TRUE} and \code{group = TRUE}, the hyperparameter
-		controlling degree of shrinkage will be further scaled such that the scale hyperparameter for interaction terms
-			is different with that of main effects by a factor of  \eqn{\sqrt{p(p-1)/2}}. 
-			When \eqn{p} is large, eg., several thousands of genetic markers, 
-			the total number of effects can easily be more than 10 millions, and \code{group EBlasso} 
-			helps to reduce the interference of spurious correlation and noise accumulation.}
   \item{verbose}{parameter that controls the level of message output from EBglment. It takes values from 0 to 5; larger verbose displays more messages. 0 is recommended for CV to avoid excessive outputs. Default value for \code{verbose} is minimum message output.}
 }
 \details{	The three priors in EBglmnet all contain hyperparameters that control how heavy the tail probabilities are. Different values of the hyperparameters will yield different number of non-zero effects retained in the model. 
@@ -114,8 +101,6 @@ out$fit
 yy = y>mean(y);
 out = cv.EBglmnet(x,yy,family="binomial")
 out$fit
-#with epistatic effects
-out = cv.EBglmnet(x,yy,family="binomial",prior= "elastic net",Epis =TRUE)
-out$fit
+
 }
 

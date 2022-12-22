@@ -1,34 +1,39 @@
-//version 4.0 --> write CV into C function to increase speed.
+
+#ifndef  USE_FC_LEN_T
+# define USE_FC_LEN_T
+#endif
+
 #include <R.h>
 #include <Rinternals.h>
 #include <math.h>
 #include <Rdefines.h>
 #include <R_ext/Rdynload.h>
 #include <stdio.h>
-#include <R_ext/Lapack.h>
+#include <R_ext/Lapack.h> 
 #include <stdlib.h>
-void fEBLinearEpisEff(double *BASIS, double *y, double *a_gamma, double *b_gamma,double *Beta, 
-				double *wald, double *intercept, int *n, int *kdim, int *VB, int *bMax,double *residual,
-				int *gp);
+#ifndef FCONE
+# define FCONE
+#endif
+
+#include "Linear.h"
+#include "Binary.h"
+
+// no explicit blas.h included; implicitly included in lapack.h
 void fEBLinearMainEff(double *BASIS, double *y, double *a_gamma, double *b_gamma,double *Beta, 
 				double *wald, double *intercept, int *n, int *kdim,int *VB,double *residual);
 				
-void fEBBinaryFull(double *BASIS, double * Targets, double *a_gamma, double * b_gamma,
-				double * logLIKELIHOOD, double * Beta, double *wald,double *intercept, int *n, int *kdim,
-				int *VB, int *bMax,int *gp);
+
 void fEBBinaryMainEff(double *BASIS, double * Targets, double *a_gamma, double * b_gamma,
 				double * logLIKELIHOOD, double * Beta, double *wald,double *intercept, int *n, int *kdim,int *VB);				
-void elasticNetLinearNeMainEff(double *BASIS, double *y, double *a_lambda, double *b_Alpha,
-				double *Beta, 
-				double *wald, double *intercept, int *n, int *kdim, int *verb,double *residual);
-void elasticNetLinearNeEpisEff(double *BASIS, double *y, double *a_lambda,double *b_Alpha, double *Beta, 
-				double *wald, double *intercept, int *n, int *kdim,int *VB,double *residual);
-void ElasticNetBinaryNEmainEff(double *BASIS, double * Targets, double *a_Lambda,double *b_Alpha,
-				double * logLIKELIHOOD, double * Beta, double *wald,double *intercept, int *n, int *kdim);
-void ElasticNetBinaryNEfull(double *BASIS, double * Targets, double *a_Lambda,double *b_Alpha,
-				double * logLIKELIHOOD, 
-				double * Beta, double *wald,double *intercept, int *n, int *kdim);				
 
+
+void elasticNetLinear(double *BASIS, double *y, double *a_lambda, double *b_Alpha,
+                      double *Beta, 
+                      double *wald, double *intercept, int *n, int *kdim, int *verb,double *residual);
+
+		
+		void ElasticNetBinary(double *BASIS, double * Targets, double *a_Lambda,double *b_Alpha,
+                        double * logLIKELIHOOD, double * Beta, double *wald,double *intercept, int *n, int *kdim);
 				
 double stdTargets(double* Targets,int N)
 {
@@ -45,21 +50,7 @@ double stdTargets(double* Targets,int N)
 }
 
 //version Note: block coordinate ascent: after each block updated: update IBinv before next iteration
-/*
-void printMat(double *a, int M, int N) //MxN
-{
-	int i,j;
-	Rprintf("Printing the matrix\n\n");
-	for(i=0;i<M;i++) 
-	{
-		for(j=0;j<N;j++)
-		{
-			Rprintf("%f\t", a[j*M +i]); //a[i,j]
-		}
-		Rprintf("\n");
-	}
-}
-*/
+
 //transpose a matrix;
 void transposeB(double *B, int M, int N) //MxN input
 {
@@ -89,6 +80,7 @@ void transposeB(double *B, int M, int N) //MxN input
 //internal function for cvFunc: compute nFold cv for one hyperparameter
 //return negative logL c(mean(ml), sd(ml);
 // the creating Xtrain, Xtest have to be repeated to allow early stop;
+//API
 void cvOnePara(double *BASIS, double *y, int *foldId, int *nfolds, 
 				int *n, int *k,int *VB,
 				double *hyperpara,double *nLogL,
@@ -182,48 +174,23 @@ fEBBinaryMainEff(Xtrain,Ytrain, &a_gamma, &b_gamma,
 				&logLIKELIHOOD, Beta, &wald, Intercept, &nTr, &p,&verbose);
 					
 				}
-			}else
-			{
-				if(GLM==0)
-				{
-fEBLinearEpisEff(Xtrain,Ytrain, &a_gamma, &b_gamma,Beta, 
-				&wald, &intercept, &nTr, &p, &verbose, &nEff,&residual,
-				group);					
-				}else
-				{
-fEBBinaryFull(Xtrain, Ytrain, &a_gamma,&b_gamma,
-				&logLIKELIHOOD, Beta, &wald,Intercept, &nTr, &p,
-				&verbose, &nEff,group);					
-				}				
 			}
+
 		}else//lassoNE, EBEN
 		{
 			if(epis == 0)
 			{
 				if(GLM==0)
 				{
-elasticNetLinearNeMainEff(Xtrain, Ytrain, &b_gamma, &a_gamma,
+elasticNetLinear(Xtrain, Ytrain, &b_gamma, &a_gamma,
 				Beta, &wald, &intercept, &nTr, &p, &verbose,&residual);
 					
 				}else
 				{
-ElasticNetBinaryNEmainEff(Xtrain,Ytrain, &b_gamma, &a_gamma,
+ElasticNetBinary(Xtrain,Ytrain, &b_gamma, &a_gamma,
 				&logLIKELIHOOD, Beta, &wald, Intercept, &nTr, &p);
 					
 				}				
-			}else
-			{
-				if(GLM==0)
-				{
-elasticNetLinearNeEpisEff(Xtrain,Ytrain, &b_gamma, &a_gamma, Beta, 
-				&wald, &intercept, &nTr, &p,&verbose,&residual);
-					
-				}else
-				{
-ElasticNetBinaryNEfull(Xtrain,Ytrain, &b_gamma, &a_gamma,
-				&logLIKELIHOOD, Beta, &wald,Intercept,&nTr, &p);
-					
-				}			
 			}
 		}// end of prior
 		

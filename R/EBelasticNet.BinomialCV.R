@@ -1,10 +1,11 @@
-EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0)
+EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,verbose = 0)
 {
 	nStep = 19;
-	cat("EBEN Logistic Model,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	Epis=FALSE;
+	cat("Empirical Bayes Elastic Net Logistic Model: ", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
-	#set.seed(proc.time())
+
 	if (missing(foldId)) 
 	{
 		if(N%%nFolds!=0){
@@ -25,13 +26,12 @@ EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbos
 	nAlpha 				= length(Alpha);
 		
 	Likelihood 			= mat.or.vec((N_step*nAlpha),4);
-	#logL 				= mat.or.vec(nFolds,1);
 	logL1alpha			= matrix(0,N_step,2);# temp matrix to keep MSE + std in each step
 
 	nLogL = rep(0,4);
 	pr = "elastic net"; #1LassoNEG; 2: lasso; 3EN
 	model = "binomial";#0linear; 1 binomial
-	group = 0;
+
 	for(i_alpha in 1:nAlpha){
 		alpha 			= Alpha[i_alpha];
 		if(verbose >=0) cat("Testing alpha", i_alpha, "/",nAlpha,":\t\talpha: ",alpha,"\t")
@@ -40,7 +40,7 @@ EBelasticNet.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbos
 			lambda 		= Lambda[i_s];
 			
 			hyperpara = c(alpha, lambda);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);
 			logL[3] = -logL[3]; #C produces negative logL;
 			Likelihood[step,] = logL;
 			logL1alpha[i_s,] 	= logL[3:4];

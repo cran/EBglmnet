@@ -1,14 +1,6 @@
-cv.EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elastic net"),nfolds=5,foldId,Epis = FALSE,group = FALSE, verbose = 0 ){
+cv.EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elastic net"),nfolds=5,foldId, verbose = 0 ){
 verbose = verbose -1;
-	if(prior!="lassoNEG" && group)
-	{
-		warning("group EBlasso is only available on the NEG prior, ignore this parameter")
-	}
-	if(!Epis && group)
-	{
-		warning("group EBlasso is designed for epistasis analysis, ignore this parameter")
-		group = FALSE;
-	}
+	
 	if (missing(foldId)) 
 	{
 		N = nrow(x);
@@ -46,50 +38,48 @@ verbose = verbose -1;
 	if(prior=="elastic net")
 	{
 		cv=switch(family,
-		"gaussian"=EBelasticNet.GaussianCV(x,y,nfolds,foldId,Epis),
-		"binomial"=EBelasticNet.BinomialCV(x,y,nfolds,foldId,Epis)
+		"gaussian"=EBelasticNet.GaussianCV(x,y,nfolds,foldId),
+		"binomial"=EBelasticNet.BinomialCV(x,y,nfolds,foldId)
 		)
 		opt_para = cv$optimal;
 		alpha = opt_para[1];
 		lambda = opt_para[2];
 		
 		fit=switch(family,
-		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,Epis,verbose),
-		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,Epis,verbose)
+		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,verbose),
+		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,verbose)
 		)
 
 		
 	}else if(prior=="lasso")
 	{
 		cv=switch(family,
-		"gaussian"=EBlassoNE.GaussianCV(x,y,nfolds,foldId,Epis,verbose),
-		"binomial"=EBlassoNE.BinomialCV(x,y,nfolds,foldId,Epis,verbose)
+		"gaussian"=EBlassoNE.GaussianCV(x,y,nfolds,foldId,verbose),
+		"binomial"=EBlassoNE.BinomialCV(x,y,nfolds,foldId,verbose)
 		)
 		alpha 	= 1;
 		lambda 	= cv$optimal
 		fit=switch(family,
-		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,Epis,verbose),
-		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,Epis,verbose)
+		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,verbose),
+		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,verbose)
 		)
 		
 	}else
 	{
 		cv=switch(family,
-		"gaussian"=EBlassoNEG.GaussianCV(x,y,nfolds,foldId, Epis,verbose,group),
-		"binomial"=EBlassoNEG.BinomialCV(x,y,nfolds,foldId, Epis,verbose,group)
+		"gaussian"=EBlassoNEG.GaussianCV(x,y,nfolds,foldId, verbose),
+		"binomial"=EBlassoNEG.BinomialCV(x,y,nfolds,foldId, verbose)
 		)	
-		#EBlassoNEG.BinomialCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0, group = FALSE)
+		
 		opt_para = cv$optimal;
 		a = opt_para[1];
 		b = opt_para[2];
 		fit=switch(family,
-		"gaussian"=EBlassoNEG.Gaussian(x,y,a,b,Epis,verbose,group),
-		"binomial"=EBlassoNEG.Binomial(x,y,a,b,Epis,verbose,group)
+		"gaussian"=EBlassoNEG.Gaussian(x,y,a,b,verbose),
+		"binomial"=EBlassoNEG.Binomial(x,y,a,b,verbose)
 		)
 	}
-	#output = list();
-	#output$CrossValidation = cv$CrossValidation;
-	#output$fit = fit;
+	
 	output = c(cv,fit);
 	output$family = family
 	output$prior = prior	

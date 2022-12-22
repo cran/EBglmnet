@@ -46,7 +46,7 @@ License: \tab gpl\cr
 }
 \author{
 Anhui Huang, Dianting Liu \cr
-Maintainer: Anhui Huang <a.huang1@umiami.edu>
+Maintainer: Anhui Huang <anhuihuang@gmail.com>
 }
 \references{
 	Huang, A., Xu, S., and Cai, X. (2015). Empirical Bayesian elastic net for multiple quantitative trait locus mapping. Heredity 114(1): 107-115.\cr\cr	

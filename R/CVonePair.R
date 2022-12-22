@@ -1,5 +1,5 @@
-CVonePair <-function(X,y,nFolds,foldId,hyperpara=c(1,0.1),Epis=FALSE, 
-					prior=c("lassoNEG","lasso","elastic net"), family = c("gaussian","binomial"), verbose = 0, group = FALSE)
+CVonePair <-function(X,y,nFolds,foldId,hyperpara=c(1,0.1), 
+					prior=c("lassoNEG","lasso","elastic net"), family = c("gaussian","binomial"), verbose = 0)
 {	
 	if(prior=="lassoNEG")
 	{
@@ -18,8 +18,11 @@ CVonePair <-function(X,y,nFolds,foldId,hyperpara=c(1,0.1),Epis=FALSE,
 	{
 		model = 1;
 	}
+  if(verbose>0) cat("Empirical Bayes Lasso/Elastic Net Logistic Model: ", nFolds, "fold cross-validation\n");
 	N = nrow(X);
 	K = ncol(X);
+	group = 0;
+	Epis = FALSE;
 	nLogL = rep(0,4);
 	output<-.C("cvOnePara",
 			BASIS 		= as.double(X),

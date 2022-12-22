@@ -1,11 +1,11 @@
 EBlassoNE.GaussianCV <-
-function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0)
+function(BASIS,Target,nFolds,foldId,verbose = 0)
 {nStep= 19
 	#early stop: for each alpha, if next lambda > SSEmin, then stop.
-	cat("EBlasso-NE Linear Model, Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	cat("Empirical Bayes LASSO Linear Model (Normal + Exponential prior): ", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
-	#set.seed(proc.time())
+	Epis=FALSE;
 	if (missing(foldId)) 
 	{
 		if(N%%nFolds!=0){
@@ -33,14 +33,14 @@ function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0)
 	nLogL = rep(0,4);
 	pr = "lasso"; #1LassoNEG; 2: lasso; 3EN
 	model = "gaussian";#0linear; 1 binomial
-	group = 0;
+
 	for (i_s in 1:N_step){			
 			lambda 				= Lambda[i_s];
 			min_index 			= which.min(SSE1Alpha[1:(i_s -1),1]);
 			previousL 			= SSE1Alpha[min_index,1] + SSE1Alpha[min_index,2];
 			if(verbose >=0) cat("\tTesting step", step, "\t\tlambda: ",lambda,"\t")
 			hyperpara = c(alpha, lambda);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);			
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);			
 			
 			SSE1Alpha[i_s,] 	= logL[3:4];
 			if(verbose >=0) cat("sum squre error",logL[3],"\n");

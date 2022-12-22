@@ -1,7 +1,7 @@
-EBlassoNEG.GaussianCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose = 0, group = FALSE){
-	cat("EBLASSO Linear Model, NEG prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+EBlassoNEG.GaussianCV <-function(BASIS,Target,nFolds,foldId, verbose = 0){
+  cat("Empirical Bayes LASSO Linear Model (Normal + Exponential + Gamma prior)", nFolds, "fold cross-validation\n");
 	N 				= nrow(BASIS);
-	#set.seed(proc.time())
+
 	if (missing(foldId)) 
 	{
 		if(N%%nFolds!=0){
@@ -18,8 +18,7 @@ EBlassoNEG.GaussianCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose 
 	N_step2 		= length(a_r2) -1;
 	N_step3 		= length(b_r2);	
 	N_step  		= N_step1 + N_step2 + N_step3;	
-	#Likelihood 		= mat.or.vec(N_step,4);
-	#logL 			= mat.or.vec(nFolds,1);
+
 	MeanSqErr 					= mat.or.vec(N_step,4);
 	SSE 						= matrix(rep(0,nFolds),nFolds,1);
 	stp 			 = 1;
@@ -27,7 +26,7 @@ EBlassoNEG.GaussianCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose 
 	nLogL = rep(0,4);
 	pr = "lasso"; #1LassoNEG; 2: lasso; 3EN
 	model = "gaussian";#0linear; 1 binomial
-	
+
 	#------------------------------------------ step one ----------------------------------
 	for (i_s1 in 1:N_step1){		
 		a_gamma 			= a_r1[i_s1];
@@ -35,7 +34,7 @@ EBlassoNEG.GaussianCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose 
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
 			
 			hyperpara = c(a_gamma, b_gamma);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);
 			
 		if(verbose >=0) cat("sum squre error",logL[3],"\n");
 		MeanSqErr[stp,] 		= logL;
@@ -53,7 +52,7 @@ N_step2 					= length(a_rS2)
 		a_gamma 			= a_rS2[i_s2];
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
 			hyperpara = c(a_gamma, b_gamma);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);
 			
 		if(verbose >=0) cat("sum squre error",logL[3],"\n");
 		MeanSqErr[stp,] 		= logL;
@@ -85,11 +84,10 @@ N_step2 					= length(a_rS2)
 		b_gamma 			= b_rS2[i_s3];
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
 					hyperpara = c(a_gamma, b_gamma);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);
 			
 		if(verbose >=0) cat("sum squre error",logL[3],"\n");
 	MeanSqErr[stp,] 		= logL;
-	#currentL				= Likelihood[stp,3] + Likelihood[stp,4];
 	currentL				= MeanSqErr[stp,3];
 	stp 					= stp + 1;			
 		# break out of 3rd step
@@ -102,7 +100,6 @@ N_step2 					= length(a_rS2)
 		}		
 	}
 	nStep = stp - 1;
-	#index 					= which.max(Likelihood[1:nStep,3]);
 	index 						= which.min(MeanSqErr[1:nStep,3]);
 	a_gamma 					= MeanSqErr[index,1];	
 	b_gamma 					= MeanSqErr[index,2];

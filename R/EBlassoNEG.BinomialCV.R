@@ -1,7 +1,6 @@
-EBlassoNEG.BinomialCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose = 0, group = FALSE){
-	cat("EBLASSO Logistic Model, NEG prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+EBlassoNEG.BinomialCV <-function(BASIS,Target,nFolds,foldId,verbose = 0){
+	cat("Empirical Bayes LASSO Logistic Model (Normal + Exponential + Gamma prior)", nFolds, "fold cross-validation\n");
 	N 				= nrow(BASIS);
-	#set.seed(proc.time())
 	if (missing(foldId)) 
 	{
 		if(N%%nFolds!=0){
@@ -14,7 +13,6 @@ EBlassoNEG.BinomialCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose =
 	b_r1 			= a_r1;
 	N_step1 		= length(a_r1);
 	a_r2 			= c(1, 0.5, 0.1, 0.05, 0.01, -0.01,-0.1,-0.2,-0.3,-0.4,-0.5,-0.6,-0.7,-0.8,-0.9);
-	#b_r2 			= c(0.01, 0.1, 1, 2, 3, 4, 5, 6,7,8,9,10); 
 	b_r2 			= c(0.01, 0.05, 0.1,0.5,1);
 	N_step2 		= length(a_r2) -1;
 	N_step3 		= length(b_r2);	
@@ -35,7 +33,7 @@ EBlassoNEG.BinomialCV <-function(BASIS,Target,nFolds,foldId,Epis=FALSE,verbose =
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
 		
 			hyperpara = c(a_gamma, b_gamma);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);
 			logL[3] = -logL[3]; #C produces negative logL;
 	
 
@@ -57,7 +55,7 @@ N_step2 = length(a_rS2)
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
 		
 		hyperpara = c(a_gamma, b_gamma);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);	
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);	
 			logL[3] = -logL[3]; #C produces negative logL;
 		
 	
@@ -91,7 +89,7 @@ N_step2 = length(a_rS2)
 		b_gamma 			= b_rS2[i_s3];
 	if(verbose >=0) cat("Testing step", stp, "\t\ta: ",a_gamma, "b: ", b_gamma,"\t")
 		hyperpara = c(a_gamma, b_gamma);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);		
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);		
 
 		if(verbose >=0) cat("log likelihood: ",logL[3],"\n");
 		Likelihood[stp,] 	= logL;
@@ -107,7 +105,6 @@ N_step2 = length(a_rS2)
 		}	
 	}
 	nStep = stp - 1;
-	#index 					= which.max(Likelihood[1:nStep,3]);
 	index 						= which.max(Likelihood[1:nStep,3]);
 	a_gamma 				= Likelihood[index,1];	
 	b_gamma 				= Likelihood[index,2];

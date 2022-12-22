@@ -1,13 +1,5 @@
-EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elastic net"),hyperparameters,Epis = FALSE,group = FALSE, verbose = 0 ){
-	if(prior!="lassoNEG" && group)
-	{
-		warning("group EBlasso is only available on the NEG prior, ignore this parameter")
-	}
-	if(!Epis && group)
-	{
-		warning("group EBlasso is designed for epistasis analysis, ignore this parameter")
-		group = FALSE;
-	}
+EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elastic net"),hyperparameters, verbose = 0 ){
+
 	if(missing(hyperparameters))
 	{
 		warning("hyperparameters controling number of nonzero effects need to be specified; run cv.EBglmnet to determine the parameters \n")
@@ -45,18 +37,18 @@ EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","las
 		lambda = hyperparameters[2];
 		if(alpha>1 || alpha<0)
 		{
-			warning("EBEN: alpha not in range of [0,1]; set to 1")
+			warning("Empirical Bayes Elastic Net: alpha not in range of [0,1]; set to 1")
 			alpha=1
 		}
 		if(lambda<0)
 		{
-			warning("EBEN: lambda should be a positive number; set lambda = 1")
+			warning("Empirical Bayes Elastic Net: lambda should be a positive number; set lambda = 1")
 			lambda = 0.1;
 		}		
 		
 		fit=switch(family,
-		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,Epis,verbose),
-		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,Epis,verbose)
+		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,verbose),
+		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,verbose)
 		)		
 	}else if(prior=="lasso")
 	{
@@ -64,13 +56,13 @@ EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","las
 		lambda = hyperparameters[1];
 		if(lambda<0)
 		{
-			warning("EBEN: lambda should be a positive number; set lambda = 1")
+			warning("Empirical Bayes Elastic Net: lambda should be a positive number; set lambda = 1")
 			lambda = 0.1;
 		}
 		
 		fit=switch(family,
-		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,Epis,verbose),
-		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,Epis,verbose)
+		"gaussian"=EBelasticNet.Gaussian(x,y,lambda,alpha,verbose),
+		"binomial"=EBelasticNet.Binomial(x,y,lambda,alpha,verbose)
 		)		
 	}else
 	{
@@ -88,14 +80,14 @@ EBglmnet <-function(x,y,family=c("gaussian","binomial"),prior= c("lassoNEG","las
 		}
 		
 		fit=switch(family,
-		"gaussian"=EBlassoNEG.Gaussian(x,y,a,b,Epis,verbose,group),
-		"binomial"=EBlassoNEG.Binomial(x,y,a,b,Epis,verbose,group)
+		"gaussian"=EBlassoNEG.Gaussian(x,y,a,b,verbose),
+		"binomial"=EBlassoNEG.Binomial(x,y,a,b,verbose)
 		)		
 	}
 	fit$family = family
 	fit$prior = prior
 	fit$call=this.call
 	fit$nobs=nobs
-	class(fit)=c(class(fit),"glmnet")
+	class(fit)=c(class(fit),"EBglmnet")
 	return(fit)	
 }

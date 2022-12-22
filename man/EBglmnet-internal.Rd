@@ -15,18 +15,18 @@
 \alias{lambdaMax}
 \description{Internal EBglmnet functions}
 \usage{
-	EBelasticNet.Binomial(BASIS,Target, lambda, alpha,Epis,verbose)
-	EBelasticNet.BinomialCV(BASIS,Target, nFolds,foldId, Epis,verbose)
-	EBelasticNet.Gaussian(BASIS,Target, lambda, alpha,Epis,verbose)
-	EBelasticNet.GaussianCV(BASIS,Target, nFolds,foldId, Epis,verbose)
-	EBlassoNE.BinomialCV(BASIS,Target,nFolds,foldId,Epis,verbose)
-	EBlassoNE.GaussianCV(BASIS,Target, nFolds,foldId,Epis,verbose)
-	EBlassoNEG.Binomial(BASIS,Target,a_gamma,b_gamma, Epis,verbose,group)
-	EBlassoNEG.BinomialCV(BASIS,Target,nFolds,foldId,Epis,verbose,group)
-	EBlassoNEG.Gaussian(BASIS,Target,a_gamma, b_gamma, Epis, verbose, group)
-	EBlassoNEG.GaussianCV(BASIS,Target,nFolds,foldId,Epis,verbose,group)
+	EBelasticNet.Binomial(BASIS,Target, lambda, alpha,verbose)
+	EBelasticNet.BinomialCV(BASIS,Target, nFolds,foldId, verbose)
+	EBelasticNet.Gaussian(BASIS,Target, lambda, alpha,verbose)
+	EBelasticNet.GaussianCV(BASIS,Target, nFolds,foldId, verbose)
+	EBlassoNE.BinomialCV(BASIS,Target,nFolds,foldId,verbose)
+	EBlassoNE.GaussianCV(BASIS,Target, nFolds,foldId,verbose)
+	EBlassoNEG.Binomial(BASIS,Target,a_gamma,b_gamma, verbose)
+	EBlassoNEG.BinomialCV(BASIS,Target,nFolds,foldId,verbose)
+	EBlassoNEG.Gaussian(BASIS,Target,a_gamma, b_gamma,  verbose)
+	EBlassoNEG.GaussianCV(BASIS,Target,nFolds,foldId,verbose)
 	ijIndex(trueLoc,K)
-	CVonePair(X,y,nFolds,foldId,hyperpara,Epis,prior,family,verbose,group)
+	CVonePair(X,y,nFolds,foldId,hyperpara,prior,family,verbose)
 	lambdaMax(X,y,Epis)
 }
 \author{Anhui Huang and Dianting Liu \cr Dept of Electrical and Computer Engineering, Univ of Miami, Coral Gables, FL}

@@ -1,13 +1,13 @@
 EBelasticNet.GaussianCV <-
-function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose = 0)
+function(BASIS,Target,nFolds,foldId, verbose = 0)
 {
 
 	nStep = 19;
 	#early stop: for each alpha, if next lambda > SSEmin, then stop.
-	cat("EB-Elastic Net Linear Model, Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	cat("Empirical Bayes Elastic Net Linear Model: ", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
-	#set.seed(proc.time())
+	Epis=FALSE
 	if (missing(foldId)) 
 	{
 		if(N%%nFolds!=0){
@@ -24,7 +24,6 @@ function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose = 0)
 	N_step 				= length(Lambda);
 
 	step 				= 1;
-	#Alpha 				= seq(from = 1, to = 0.1, by = -0.1)
 	Alpha 				= seq(from = 0.9, to = 0.1, by = -0.1)
 	nAlpha 				= length(Alpha);
 		
@@ -36,8 +35,8 @@ function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose = 0)
 	nLogL = rep(0,4);
 	pr = "elastic net"; #1LassoNEG; 2: lasso; 3EN
 	model = "gaussian";#0linear; 1 binomial
-	group = 0;
-	
+
+
 	for(i_alpha in 1:nAlpha){
 		alpha 					= Alpha[i_alpha];
 		SSE1Alpha				= matrix(1e10,N_step,2);# temp matrix to keep MSE + std in each step
@@ -50,7 +49,7 @@ function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose = 0)
 			#cat("\tTesting step", step, "\t\tlambda: ",lambda,"\t")
 
 			hyperpara = c(alpha, lambda);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);
 			SSE1Alpha[i_s,] 	= logL[3:4];
 			#cat("sum squre error",mean(MeanSqErr),"\n");
 			MSEcv[step,]		= logL;

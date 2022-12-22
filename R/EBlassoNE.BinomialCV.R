@@ -1,10 +1,11 @@
-EBlassoNE.BinomialCV <- function(BASIS,Target,nFolds,foldId,Epis=FALSE, verbose = 0)
+EBlassoNE.BinomialCV <- function(BASIS,Target,nFolds,foldId, verbose = 0)
 {
 nStep= 19
-	cat("EBLASSO Logistic Model, NE prior,Epis: ",Epis, ";", nFolds, "fold cross-validation\n");
+	cat("Empirical Bayes LASSO Logistic Model (Normal + Exponential prior)", nFolds, "fold cross-validation\n");
 	N 					= nrow(BASIS);
 	K 					= ncol(BASIS);
-	#set.seed(proc.time())
+	Epis=FALSE;
+
 	if (missing(foldId)) 
 	{
 		if(N%%nFolds!=0){
@@ -24,19 +25,18 @@ nStep= 19
 	nAlpha 				= 1;
 		
 	Likelihood 			= mat.or.vec((N_step*nAlpha),4);
-	#logL 				= mat.or.vec(nFolds,1);
 	nLogL = rep(0,4);
 	pr = "lasso"; #1LassoNEG; 2: lasso; 3EN
 	model = "binomial";#0linear; 1 binomial
-	group = 0;
-	
+
+
 	for (i_s in 1:N_step){			
 			lambda 		= Lambda[i_s];
 
 	if(verbose >=0) cat("\tTesting step", step, "\t\tlambda: ",lambda,"\t")
 				
 			hyperpara = c(alpha, lambda);
-			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,Epis,pr,model,verbose,group);	
+			logL = CVonePair(BASIS,Target,nFolds, foldId,hyperpara,pr,model,verbose);	
 			
 			logL[3] = -logL[3]; #C produces negative logL;
 			Likelihood[step,] = logL;

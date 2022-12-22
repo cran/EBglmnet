@@ -10,7 +10,7 @@
 			}
 \usage{
 EBglmnet(x, y, family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elastic net"),
-	hyperparameters,Epis = FALSE,group = FALSE, verbose = 0)
+	hyperparameters, verbose = 0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -31,19 +31,6 @@ EBglmnet(x, y, family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elas
   While \code{cv.EBglmnet} already provides the model fitting results using the hyperparameters determined in CV,
   users can use this function to obtain the results under other parameter selection criteria such as Akaike information criterion
   (AIC) or Bayesian information criterion (BIC). } 
-  \item{Epis}{Boolean parameter for including two-way interactions. By default, \code{Epis = FALSE}. When
-  \code{Epis = TRUE}, EBglmnet will take all pair-wise interaction effects into consideration. EBglmnet does not 
-  create a giant matrix for all the \code{p(p+1)/2} effects. Instead, it dynamically allocates memory for the 
-  nonzero effects identified in the model, and reads the corresponding variables from the original input matrix 
-  \code{x}}
-  \item{group}{Boolean parameter for \code{group EBlasso} (currently only available for the \code{"lassoNEG"} 
-  prior). This parameter is only valid when \code{Epis = TRUE}, 
-	and is set to \code{FALSE} by default. When \code{Epis = TRUE} and \code{group = TRUE}, the hyperparameter
-		controlling degree of shrinkage will be further scaled such that the scale hyperparameter for interaction terms
-			is different with that of main effects by a factor of  \eqn{\sqrt{p(p-1)/2}}. 
-			When \eqn{p} is large, eg., several thousands of genetic markers, 
-			the total number of effects can easily be more than 10 millions, and \code{group EBlasso} 
-			helps to reduce the interference of spurious correlation and noise accumulation.}
   \item{verbose}{parameter that controls the level of message output from EBglment. It takes values from 0 to 5; larger verbose displays more messages. small values are recommended to avoid excessive outputs. Default value for \code{verbose} is minimum message output.}
 }
 \details{EBglmnet implements three set of hierarchical prior distributions for the regression parameters \eqn{\beta}: \cr\cr
@@ -93,14 +80,11 @@ and \eqn{\lambda (\lambda >0)}.  Therefore, users are asked to specify \code{hyp
 	coefficients and estimates their posterior distributions. With the posterior mean and variance, a \code{t-test} 
 	is performed and the \code{p-value} is calculated. Result in fit is a matrix with rows corresponding to the 
 	variables having nonzero effects, and columns having the following values: \cr\cr
-	column1-2: (locus1, locus2) denoting the column number in the input matrix \code{x}. When locus1 equals to locus2, 
-	this effect is from one of the \code{p} main effects, otherwise, it is the interaction effect between \code{x[,locus1]} and 
-	\code{x[,locus2]}. When \code{Epis = FALSE}, which is the default setting, locus1 always equals locus2.  If \code{Epis =TRUE},
-	fit always puts the main effects in the beginning, and epistatic effects after that. \cr\cr
-	column3: beta. It is the posterior mean of the nonzero regression coefficients. \cr\cr
-	column4: posterior variance.  It is the diagonal element of the posterior covariance matrix among the nonzero regression coefficients. \cr\cr
-	column5: t-value calculated using column 3-4. \cr\cr
-	column6: p-value from t-test.	
+	column1: (predictor index in X) denoting the column number in the input matrix \code{x}. \cr\cr
+	column2: beta. It is the posterior mean of the nonzero regression coefficients. \cr\cr
+	column3: posterior variance.  It is the diagonal element of the posterior covariance matrix among the nonzero regression coefficients. \cr\cr
+	column4: t-value calculated using column 3-4. \cr\cr
+	column5: p-value from t-test.	
 	}
 	\item{WaldScore}{the Wald Score for the posterior distribution. It is computed as \eqn{\beta^T\Sigma^{-1}\beta}. 
 	See (Huang A, 2014b) for using Wald Score to identify significant effect set.}
@@ -151,8 +135,6 @@ out$Intercept
 yy = y>mean(y);
 out = EBglmnet(x,yy,family="binomial",hyperparameters=c(0.5,0.5))
 out$fit
-#with epistatic effects
-out = EBglmnet(x,yy,family="binomial",hyperparameters=c(0.5,0.5),Epis =TRUE)
-out$fit
+
 }
 

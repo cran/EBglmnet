@@ -1,7 +1,10 @@
 
 
 ---
-output: pdf_document
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 <!-- 
@@ -27,15 +30,27 @@ output: pdf_document
 
 > [Example of p>n Data](#example)
 
-> [Parallel Cross Validation](#parallel)
+
 
 <a id="intro"></a>
 
 ## Introduction 
 
-#### Acronyms to be used
- 
-EBglmnet is a package that implements the empirical Bayesian Lasso (EBlasso) and Elastic Net (EBEN) method for generalized linear models (GLMs). Additionally, in `EBlasso`, two different prior distributions are also developed: one with two-level hierarchical Normal + Exponential prior (denoted as `NE`), and the other one with three-level Normal + Exponential + Gamma prior (denoted as `NEG`). The following names should not be confused with the `lasso` and `elastic net`  method from the comparison package `glmnet`:
+#### Acronyms and Concepts 
+<br>  
+<br>
+EBglmnet is a package that implements the empirical Bayesian Lasso (EBlasso) and Elastic Net (EBEN) method for generalized linear models (GLMs). Additionally, in `EBlasso`, two different prior distributions are also developed: one with two-level hierarchical Normal + Exponential prior (denoted as `NE`), and the other one with three-level Normal + Exponential + Gamma prior (denoted as `NEG`). The major difference of the prior distributions are the probability density around zero and two tails:
+\begin{itemize}
+\item{Probability density around zero: higher probability density around zero will enforce stronger shrinkage effect, resulting in more sparse model (i.e., the model set the coefficients of predictors with small or noise prediction power to zero);}
+\item{Probability density on tails: higher probability density around tails leave enough room for strong predictors to stay with none-zero coefficients.}
+\end{itemize}
+
+
+A good prior distribution is a balance of the aforementioned properties as shown in the Figure 1. Generally, `NE prior` leads to more non-zero predictors with smaller absolute coefficient values, while `NEG prior` leads to less non-zero predictors with stronger signals in terms of both absolute coefficient values as well as significance level.
+
+![Prior distributions that penalise posterior distributions](priors.jpg){width=50%, height=55%}
+
+The following names should not be confused with the `lasso` and `elastic net`  method from the comparison package `glmnet`:
 
 `EBglmnet`: package that implements `EBlasso` and `EBEN` methods.
 
@@ -52,7 +67,10 @@ EBglmnet is a package that implements the empirical Bayesian Lasso (EBlasso) and
 `EBlasso-NEG`: `EBlasso` method with `NEG` prior.
 
 
-#### Generalized Linear Models (GLMs)
+#### Generalized Linear Models (GLMs) 
+<br>
+<br>
+
 In a GLM 
 
 $$
@@ -128,7 +146,7 @@ $$
 \lambda \sim gamma(a,b), j = 1, \dots,p
 $$
 
-Comparing with `EBlasso-NE`, the NEG prior has a larger probability centered at 0, and will only yield nonzero regression coefficients for effects having relatively large signal to noise ratio. 
+Comparing with `EBlasso-NE`, the NEG prior has both large probability density centered at 0 and two tails, and will only yield nonzero regression coefficients for effects having relatively large signal to noise ratio. 
 
 #### Prior 3: Elastic Net Prior for Grouping Effect
 
@@ -180,7 +198,7 @@ The authors of `EBglmnet` are Anhui Huang  and Dianting Liu. This vignette descr
 install.packages("EBglmnet", repos = "http://cran.us.r-project.org")
 ```
 
-which will download and install the package to the default directory. Alternatively, users can download the pre-compiled binary file at http://cran.r-project.org/web/packages/EBglmnet/index.html, and install it from local package.
+which will download and install the package to the default directory. Alternatively, users can download the pre-compiled binary file from CRAN and install it from local package.
 
 [Back to Top](#top)
 
@@ -212,18 +230,18 @@ output = EBglmnet(x,y,hyperparameters = c(0.1, 0.1))
 ```{r}
 glmfit = output$fit
 variables = xNames[glmfit[,1,drop=FALSE]]
-cbind(variables,as.data.frame(round(glmfit[,3:6,drop=FALSE],4)))
+cbind(variables,as.data.frame(round(glmfit[,2:5,drop=FALSE],4)))
 ```
 The hyperparameters in each of the prior distributions control the number of non-zero effects to be selected, and  cross-validation (CV) is perhaps the simplest and most widely used method in deciding their values. `cv.EBglmnet` is the main function to do cross-validation, which can be called using the following code.
-```{r}
+```{r, eval=FALSE}
 cvfit = cv.EBglmnet(x, y)
 ```
 `cv.EBglmnet` returns a `cv.EBglmnet` object, which is a list with all the ingredients of CV and the final fit results using CV selected hyperparameters. We can view the CV results, selected hyperparameters and the corresponding coefficients. For example, result using different hyperparameters and the corresponding prediction errors are shown below:
-```{r}
+```{r, eval=FALSE}
 cvfit$CrossValidation
 ```
 The selected parameters and the corresponding fitting results are:
-```{r}
+```{r, eval=FALSE}
 cvfit$hyperparameters
 cvfit$fit
 ```
@@ -255,22 +273,16 @@ For illustration purpose, the above codes created a binary variable `yy` by set 
 
 <a id="prior"></a>
 
-##Prior, Hyperparameters and Epistasis
+## Prior, Hyperparameters and Epistasis
 
 The three sets of hierarchical prior distribution can be specified by `prior` option in `EBglmnet`. By default, `EBglmnet` assumes the `lassoNEG` prior. The following example changes the prior via `prior` parameter:
 ```{r}
 output = EBglmnet(x,yy,family="binomial", prior = "elastic net", hyperparameters = c(0.1, 0.1))
+output$fit
 ```
 Note that the hyperparameters setup is associated with a specific prior. In `lasso` prior, only one hyperparameter $\lambda$ is required, while in `elastic net` and `lassoNEG`, two hyperparameters need to be specified. For `EBEN` having the `elastic net` prior distribution, the two hyperparameters $\lambda_1$ and $\lambda_2$ are defined in terms of other two parameters $\alpha \in [0,1]$ and $\lambda>0$ same as in `glmnet` package, such that $\lambda_1 = (1-\alpha)\lambda$ and  $\lambda_2 = \alpha\lambda$. Therefore, users are asked to specify $hyperparameters=c(\alpha, \lambda)$. 
 
 
-In genetic and population analysis, sometimes it is interested in analyzing the interaction terms among the variables (epistasis). `EBglmnet` provides a feature that can incorporate all pair-wise interactions into analysis, which is achieved by setting `Epis` as `TRUE`:
-```{r}
-output = EBglmnet(x,yy,family="binomial", prior = "elastic net", 
-                  hyperparameters = c(0.1, 0.1),Epis = TRUE)
-output$fit
-```
-When `Epis = TRUE`, both $p$ number of main effects and $p(p-1)/2$ number of interaction effects are considered in the model. In the output, `locus1` and `locus2` denote the pair of interaction variables, and if the numbers are the same, the corresponding effect is from a main effect.  Users should be aware of the significant larger number variables (i.e., $p(p-1)/2$ more variables), thus a longer time to finish the computation.
 
 [Back to Top](#top)
 
@@ -278,23 +290,23 @@ When `Epis = TRUE`, both $p$ number of main effects and $p(p-1)/2$ number of int
 
 <a id="example"></a>
 
-##Example of p>n Data
+## Example of p>n Data
 ### Gaussian Model with Main Effects
  We will demontrate the application of EBglmnet in multiple QTL mapping using a simulated F2 population, which is available along with EBglmnet package. The genotype of the F2 population is simulated  from cross of two inbred lines. A total of $p=481$ gentic markers were simulated to be evenly spaced on a large chromosome of 2400 centi-Morgan (cM) with an interval of d = 5 cM. Theoretically, two adjacent markers have a correlation coefficient $R = e^{-2d} = 0.9048$ since the Haldane map function is assumed. The dummy variable for the three genotypes, AA, Aa and aa of individual i at marker j was defined as $x_{ij} = 1, 0, -1$, respectively.  
-```{r} 
-data(BASIS)#this is the genotype of the the F2 population
+```{r, eval=FALSE}
+data(BASIS)#this is the predictors matrix
 N = nrow(BASIS)
 p = ncol(BASIS)
 j = sample((p-2),1)
-cor(BASIS[,c(j,j+1,j+2)]) #Correlation structure among neighboring markers
+cor(BASIS[,c(j,j+1,j+2)]) #Correlation structure among predictors 
 ```
 
 Let us first simulate a quantitative phenotype with population mean 100 and residual variance that contribute to 10% of population variance. Ten QTLs were simulated from the 481 markers, and effect sizes are randomly generated from [2,3]. We assume that QTLs were coincided with markers. If QTLs were not on markers, they may still be detected given the above correlation structure, although a slightly larger sample size may be needed to give the same PD:
 
-```{r} 
+```{r, eval=FALSE}
 set.seed(1);
 Mu = 100; #population mean;
-nTrue = 10; # we assume 10 out of the 481 effects are true QTLs
+nTrue = 10; # we assume 10 out of the 481 predictors are true causal ones
 trueLoc	= sort(sample(p,nTrue));
 trueEff = runif(nTrue,2,3); #effect size from 2-3
 xbeta = BASIS[,trueLoc]%*%trueEff;
@@ -304,14 +316,14 @@ y = Mu + xbeta + residual;
 ```
 
 To demonstrate the performance of EBglmnet in analyzing dataset with $p>n$, we will analyze the simulated dataset using a smaller sample size $n=300$:
-```{r} 
+```{r, eval=FALSE}
 n = 300;
 index = sample(N,n); 
 CV = cv.EBglmnet(x=BASIS[index,],y=y[index],family="gaussian",prior= "lassoNEG",nfold= 5)
 ```
 
 With 5 fold CV, EBlasso-NEG identified the following effects:
-```{r} 
+```{r, eval=FALSE}
 CV$fit
 trueLoc
 ```
@@ -324,13 +336,13 @@ In many genetics and population analysis such as binary QTL mapping or GWAS, bot
 
 ####  Benchmarking using EBglmnet
 In the simulated F2 population, if we consider both main and epistatic effects, there will be a total number $p' = 115,921$ candidate effects. We will randomly select 10 main and 10 interaction effects as true effects. we will use sample size $n = 300$, and also randomly generate effect sizes from unif[2,3]. Note that an epistatic effect is generated by dot product of two interacting main effects:
-```{r}
+```{r, eval=FALSE}
 n = 300;
 set.seed(1)
 index = sample(nrow(BASIS),n)
 p = ncol(BASIS);
 m = p*(p+1)/2;
-#1. simulate true QTL locations
+#1. simulate true causal effects
 nMain = 10;
 nEpis  = 10;
 mainLoc = sample(p,nMain);
@@ -338,7 +350,7 @@ episLoc = sample(seq((p+1),m,1),nEpis);
 trueLoc = sort(c(mainLoc,episLoc)); #a vector in [1,m]
 nTrue = length(trueLoc);
 trueLocs = ijIndex(trueLoc, p); #two columns denoting the pair (i,j)
-#2. obtain true QTL genotype
+#2. obtain true predictors
 basis = matrix(0,n,nTrue);
 for(i in 1:nTrue)
 {
@@ -350,28 +362,30 @@ for(i in 1:nTrue)
 		basis[,i] = BASIS[index,trueLocs[i,1]]*BASIS[index,trueLocs[i,2]]
 	}
 }
-#3. simulate true QTL effect size	
+#3. simulate true effect size	
 trueEff  = runif(nTrue,2,3);
-#4. simulate phenotype
+#4. simulate response variables
 xbeta = basis%*%trueEff;
 vary = var(xbeta);
 Pr = 1/(1+ exp( -xbeta));
 y = rbinom(n,1,Pr);
+
 ```
 
 Now we have the phenotype simulated. Let us demonstrate the data analysis using EBlasso-NE as an example. Given the significant larger number of candidate effects (200 times more effects), this will take a longer time for CV to finish  $(n_{folds} \times n_{hyperparameters} + 1)$ times of calling EBglmnet algorithm. In fact, the computational time is mostly determined by the number of nonzero effects selected by the model. This can be seen if a larger sample size is used (note: if you set $n=1000$, this will take several more hours to finish the $(n_{folds} \times n_{hyperparameters} + 1)$ times computation (Altough a higher PD will be obtained).
-```{r eval=FALSE}
-CV = cv.EBglmnet(x=BASIS[index,],y=y,family="binomial",prior="lasso",nfold=5,Epis =TRUE)
-ind = which(CV$fit[,6]<=0.1)#p-value cutoff
+```{r, eval=FALSE}
+CV = cv.EBglmnet(x=BASIS[index,],y=y,family="binomial",prior="lasso",nfold=5)
+ind = which(CV$fit[,5]<=0.1)#p-value cutoff
 CV$fit[ind,]
 ```
-By comparing `trueLocs` and the effects identified by EBglmnet, it is demonstrated that EBlasso-NE has PD =0.50, FDR =0.09 using $p$-value cutoff = 0.10. As discussed earlier, lasso prior assigns a large probability mass in the two tails, resulting in a large number of small effects with large $p$-values. Without filtering using $p-value$, EBlasso-NE has PD = 0.85 and FDR = 0.65.
+As discussed earlier, lasso prior assigns a large probability mass in the two tails, resulting in a large number of small effects with large $p$-values.
+
 
 #### Separation Problem
 Compared with `EBglmnet`, `glmnet` does not have a reasonable result in analyzing this dataset, partially because of the separation problem. Let us first show the result using lasso approach.
 
 Since glmnet has no built-in facility for epistasis analysis, we will manually create a genotype matrix $\mathbf{X}$ containing all main and epistasis effects. 
-```{r}
+```{r, eval=FALSE}
 X = matrix(0,n,m);
 X[,1:p] = BASIS[index,];
 kk = p + 1;
@@ -386,7 +400,7 @@ for(i in 1:(p-1))
 ```
 
 Let us analyze the dataset using lasso, examine the lasso selection path:
-```{r}
+```{r, eval=FALSE}
 library(glmnet);
 alpha = 1
 lambdaRatio = 1e-4; #same as in EBlasso
@@ -409,7 +423,7 @@ The result above demonstrated that lasso was not able to complete the selection 
 
 We can also take  a closer look by re-fitting the lasso selected effects in an ordinary logistic regression model, which will explicitly print out the warning message of separation:
 
-```{r}
+```{r, eval=FALSE}
 lambda= cv$lambda.min
 coefs = fit0$beta
 ind = which(cv$lambda==cv$lambda.min)
@@ -430,82 +444,25 @@ where $\hat{\boldsymbol{\beta}}_{\lambda_{k-1}}$ is the nonzero coefficients fou
 
 EBglmnet doesn't implement such type of discarding rule and is more numerically stable. In the above simulation, EBglmnet can still identify several true effects with reasonable FDR. More simulation results using EBglmnet are available in (Huang et al., 2013) and the EBglmnet Application Note.
 
-<a id="parallel"></a>
-
-##Parallel Cross Validation
-
-Although `EBglmnet` is efficient in inferring model parameters with given hyperparameters, there is no efficient selection path and discarding rules implemented.  Additionally, when epistasis is considered, `EBglmnet` allocates more computational resources to dynamically create the interaction variables so as to get around of memory shortage problem (by not creating the giant input matrix of $n \times p'$ and other temporary variables). Evaluating $(n_{folds} \times n_{hyperparameters} + 1)$ times in serial can take many hours for a large dataset. Alternatively, in workstation/computer cluster environment, users can take advantage of parallel computational resources provided by R to reduce the computational time.  In the following example, the `snow` package will be used to demonstrate parallel CV.
-
-```{r eval=FALSE}
-#1. create the hyperparameters to be evaluated
-familyPara = "gaussian";
-priorPara = "elastic net";
-epis =TRUE;
-lambda_Max = lambdaMax(BASIS[index,],y,epis);
-nStep = 9;#steps from lambda_max to 0.0001*lambda_min
-lambda_Min = 0.0001*lambda_Max;
-step = (log(lambda_Max) - log(lambda_Min))/nStep;
-Lambda	= exp(seq(from = log(lambda_Max),to=log(lambda_Min),by= -step))
-N_step	= length(Lambda);
-Alpha = seq(from = 1, to = 0.1, by = -0.1)# values of alpha
-nAlpha = length(Alpha);	
-nPara = nAlpha * N_step;
-HyperPara = matrix(0,nPara,2);
-for(j in 1:nAlpha)
-{
-	strt = (j-1)*N_step + 1;
-	ed 	= (j-1)*N_step + N_step;
-	HyperPara[strt:ed,1] = rep(Alpha[j],N_step);
-	HyperPara[strt:ed,2] = Lambda;
-}
-
-#2. create a function for parallel computaiton
-EBglmnet.CVonePar <-function(iHyper,X,y,nFolds,foldId,hyperPara,...)
-{
-  parameters= hyperPara[iHyper,];
-  SSE = CVonePair(X,y,nFolds,foldId,parameters,...);
-  return(SSE);
-}
-
-#3. setup parallel computation
-library(snow)
-library(EBglmnet)
-ncl = 4; #use 4 CPUs
-cl<-makeCluster(ncl,type="SOCK")
-clusterEvalQ(cl,{library(EBglmnet)})
-iPar = matrix(seq(1,nPara,1),nPara,1);
-nFolds = 5;#5 fold CV
-if(n%%nFolds!=0){
-	foldId= sample(c(rep(1:nFolds,floor(n/nFolds)),1:(n%%nFolds)),n);
-}else{
-	foldId= sample(rep(1:nFolds,floor(n/nFolds)),n);
-}
-#call parRapply to perform parallel computation
-SSE = parRapply(cl,iPar,EBglmnet.CVonePar,BASIS[index,],y,nFolds,foldId,HyperPara,
-                Epis = epis, prior = priorPara, family= familyPara);	
-#collect the result in CVresult
-CVresult =matrix(SSE,nPara,4,byrow=TRUE)#4 columns of cv$
-stopCluster(cl)
-```
 
 ## References
  
 ### EBglmnet Algorithms:
 
 <p>Anhui Huang, Shizhong Xu, and Xiaodong Cai. (2015). <br>
-<a href="http://www.nature.com/hdy/journal/v114/n1/full/hdy201479a.html/">Empirical Bayesian elastic net for multiple quantitative trait locus mapping.</a><br>
+Empirical Bayesian elastic net for multiple quantitative trait locus mapping.</a><br>
 <em>Heredity</em>, Vol. 114(1), 107-115.</p>
 <p>Anhui Huang, Shizhong Xu, and Xiaodong Cai. (2014a).<br>
-<a href="http://journals.plos.org/plosone/article?id=10.1371/journal.pone.0087330/">Whole-genome quantitative trait locus mapping reveals major role of epistasis on yield of rice.</a><br>
+Whole-genome quantitative trait locus mapping reveals major role of epistasis on yield of rice.</a><br>
 <em>PLoS ONE</em>, Vol. 9(1) e87330.</p>
 <p>Anhui Huang, Eden Martin, Jeffery Vance, and Xiaodong Cai (2014b).<br>
-<a href="http://onlinelibrary.wiley.com/doi/10.1002/gepi.21803/abstract?userIsAuthenticated=false&deniedAccessCustomisedMessage=/">Detecting genetic interactions in pathway-based genome-wide association studies.</a><br>
+Detecting genetic interactions in pathway-based genome-wide association studies.</a><br>
 <em>Genetic Epidemiology</em>, 38(4), 300-309.</p>
 <p> Anhui Huang, Shizhong Xu, and Xiaodong Cai. (2013). <br>
-<a href="http://www.biomedcentral.com/1471-2156/14/5">Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping. </a><br>
+Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping. </a><br>
 <em>BMC Genetics</em>, 14(1),5.</p>
 <p>Xiaodong Cai, Anhui Huang, and Shizhong Xu (2011). <br>
-<a href="http://www.biomedcentral.com/1471-2105/12/211">Fast empirical Bayesian LASSO for multiple quantitative trait locus mapping. </a><br>
+Fast empirical Bayesian LASSO for multiple quantitative trait locus mapping. </a><br>
 <em>BMC Bioinformatics</em>, 12(1),211.</p>
 
 ## Lasso and glmnet package
@@ -516,5 +473,3 @@ stopCluster(cl)
 <p>Zou, H., and T. Hastie (2005). Regularization and variable selection via the elastic net. J. Roy. Stat. Soc. B. Met. 67(2): 301-320.</p>
 <p>Tibshirani, R. (1996). Regression shrinkage and selection via the lasso. J. Roy. Stat. Soc. B. Met. 58(1): 267-288.</p>
 
-## Separation in logistic regression
-<p>Altman M, Gill J, and Mcdonald M P. Numerical Issues in Statistical Computing for the Social Scientist. Journal of the American Statistical Association, 2005, 100(470):707-708.</p>
