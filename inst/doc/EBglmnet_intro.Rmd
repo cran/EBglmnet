@@ -1,10 +1,19 @@
 
-
 ---
+title: "EBglmnet Vignette"
+author: 
+  - Anhui Huang
+  - Dianting Liu
+date: "Jan. 15, 2016"
 output:
-  pdf_document: default
-  html_document:
-    df_print: paged
+  pdf_document:
+    fig_caption: yes
+    toc: yes
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{EBglmnet Vignette}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\usepackage[utf8]{inputenc}    
 ---
 
 <!-- 
@@ -14,9 +23,6 @@ output:
 
 <a id="top"></a>
 
-# EBglmnet Vignette
-### Anhui Huang and Dianting Liu
-#### Jan. 15, 2016
 
 > [Introduction](#intro)
 
@@ -214,7 +220,7 @@ rm(list = ls())
 library(EBglmnet)
 ```
 We will use an R built-in dataset `state.x77` as an example, which includes a matrix with 50 rows and 8 columns giving the following measurements in the respective columns: Population, Income, Illiteracy, Life Expectancy, Murder Rate, High School Graduate Rate, Days Below Freezing Temperature, and Land Area. The default model used in the package is the Gaussian linear model, and we will demonstrate it using Life Expectancy as the response variable and the remaining as explanatory variables. We create the input data as showed below, and users can load their own data and prepare variable `y` and `x` following this example.
-```{r}
+```{r, eval=FALSE}
 varNames = colnames(state.x77);
 varNames
 y= state.x77[,"Life Exp"]
@@ -222,12 +228,12 @@ xNames = c("Population","Income","Illiteracy", "Murder","HS Grad","Frost","Area"
 x = state.x77[,xNames]
 ```
 We fit the model using the most basic call to  `EBglmnet` with default prior
-```{r}
+```{r, eval=FALSE}
 set.seed(1)
 output = EBglmnet(x,y,hyperparameters = c(0.1, 0.1))
 ```
 "output" is a list containing all the relevant information of the fitted model. Users can examine the output by directly looking at each element in the list. Particularly, the sparse regression coefficients can be extracted as showed below:
-```{r}
+```{r, eval=FALSE}
 glmfit = output$fit
 variables = xNames[glmfit[,1,drop=FALSE]]
 cbind(variables,as.data.frame(round(glmfit[,2:5,drop=FALSE],4)))
@@ -256,14 +262,14 @@ Two families of models have been developed in `EBglmnet`, the  `gaussian` family
 
 ### Gaussian Model
 `EBglmnet` assumes a Gaussian distribution on `y` by default, i.e., $\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi) = N( \mu\mathit{\boldsymbol{I}} + \mathbf{X}\boldsymbol{\beta}, \sigma_0^2\boldsymbol{I})$, where $\varphi= \sigma_0^2$ is the residual variance. In the above example, both $\hat{\mu}$ and $\hat{\sigma_0}^2$ are listed in the output: 
-```{r}
+```{r, eval=FALSE}
 output$Intercept
 output$residual
 ```
 ### Binomial Model
  
 If there are two possible outcomes in the response variable, a binomial distribution assumption on `y` is available in `EBglmnet`, which has $\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)$ following a binomial distribution and $\varphi\in\emptyset$. Same as the widely-used logistic regression model, the link function is $\eta_i = logit(p_i)=\log(\frac{Pr(y_i)=1}{1-Pr(y_i=1)}), i = 1, \dots, n$. To run `EBglmnet` with binomial models, users need to specify the parameter `family` as `binomial`:
-```{r}
+```{r, eval=FALSE}
 yy = y>mean(y);
 output = EBglmnet(x,yy,family="binomial", hyperparameters = c(0.1, 0.1))
 ```
@@ -273,10 +279,10 @@ For illustration purpose, the above codes created a binary variable `yy` by set 
 
 <a id="prior"></a>
 
-## Prior, Hyperparameters and Epistasis
+## Prior and Hyperparameters
 
 The three sets of hierarchical prior distribution can be specified by `prior` option in `EBglmnet`. By default, `EBglmnet` assumes the `lassoNEG` prior. The following example changes the prior via `prior` parameter:
-```{r}
+```{r, eval=FALSE}
 output = EBglmnet(x,yy,family="binomial", prior = "elastic net", hyperparameters = c(0.1, 0.1))
 output$fit
 ```
@@ -293,7 +299,7 @@ Note that the hyperparameters setup is associated with a specific prior. In `las
 ## Example of p>n Data
 ### Gaussian Model with Main Effects
  We will demontrate the application of EBglmnet in multiple QTL mapping using a simulated F2 population, which is available along with EBglmnet package. The genotype of the F2 population is simulated  from cross of two inbred lines. A total of $p=481$ gentic markers were simulated to be evenly spaced on a large chromosome of 2400 centi-Morgan (cM) with an interval of d = 5 cM. Theoretically, two adjacent markers have a correlation coefficient $R = e^{-2d} = 0.9048$ since the Haldane map function is assumed. The dummy variable for the three genotypes, AA, Aa and aa of individual i at marker j was defined as $x_{ij} = 1, 0, -1$, respectively.  
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 data(BASIS)#this is the predictors matrix
 N = nrow(BASIS)
 p = ncol(BASIS)
@@ -303,7 +309,7 @@ cor(BASIS[,c(j,j+1,j+2)]) #Correlation structure among predictors
 
 Let us first simulate a quantitative phenotype with population mean 100 and residual variance that contribute to 10% of population variance. Ten QTLs were simulated from the 481 markers, and effect sizes are randomly generated from [2,3]. We assume that QTLs were coincided with markers. If QTLs were not on markers, they may still be detected given the above correlation structure, although a slightly larger sample size may be needed to give the same PD:
 
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 set.seed(1);
 Mu = 100; #population mean;
 nTrue = 10; # we assume 10 out of the 481 predictors are true causal ones
@@ -336,7 +342,7 @@ In many genetics and population analysis such as binary QTL mapping or GWAS, bot
 
 ####  Benchmarking using EBglmnet
 In the simulated F2 population, if we consider both main and epistatic effects, there will be a total number $p' = 115,921$ candidate effects. We will randomly select 10 main and 10 interaction effects as true effects. we will use sample size $n = 300$, and also randomly generate effect sizes from unif[2,3]. Note that an epistatic effect is generated by dot product of two interacting main effects:
-```{r, eval=FALSE}
+```{r, eval=TRUE}
 n = 300;
 set.seed(1)
 index = sample(nrow(BASIS),n)
@@ -373,7 +379,7 @@ y = rbinom(n,1,Pr);
 ```
 
 Now we have the phenotype simulated. Let us demonstrate the data analysis using EBlasso-NE as an example. Given the significant larger number of candidate effects (200 times more effects), this will take a longer time for CV to finish  $(n_{folds} \times n_{hyperparameters} + 1)$ times of calling EBglmnet algorithm. In fact, the computational time is mostly determined by the number of nonzero effects selected by the model. This can be seen if a larger sample size is used (note: if you set $n=1000$, this will take several more hours to finish the $(n_{folds} \times n_{hyperparameters} + 1)$ times computation (Altough a higher PD will be obtained).
-```{r, eval=FALSE}
+```{r}
 CV = cv.EBglmnet(x=BASIS[index,],y=y,family="binomial",prior="lasso",nfold=5)
 ind = which(CV$fit[,5]<=0.1)#p-value cutoff
 CV$fit[ind,]
@@ -385,7 +391,7 @@ As discussed earlier, lasso prior assigns a large probability mass in the two ta
 Compared with `EBglmnet`, `glmnet` does not have a reasonable result in analyzing this dataset, partially because of the separation problem. Let us first show the result using lasso approach.
 
 Since glmnet has no built-in facility for epistasis analysis, we will manually create a genotype matrix $\mathbf{X}$ containing all main and epistasis effects. 
-```{r, eval=FALSE}
+```{r}
 X = matrix(0,n,m);
 X[,1:p] = BASIS[index,];
 kk = p + 1;
@@ -400,7 +406,7 @@ for(i in 1:(p-1))
 ```
 
 Let us analyze the dataset using lasso, examine the lasso selection path:
-```{r, eval=FALSE}
+```{r}
 library(glmnet);
 alpha = 1
 lambdaRatio = 1e-4; #same as in EBlasso
@@ -419,11 +425,13 @@ ticks = seq(1,nLambda,10)
 axis(side=1, at= ticks,labels=round(cv$lambda[ticks],5), las=1,cex.axis = 0.5)
 title("Number of nonzero effects in lasso selection path")
 ```
-The result above demonstrated that lasso was not able to complete the selection path, and exited at the 78 out of 100 candidate $\lambda$s. From the scatterplot, it is shown that the number of nonzero effects has stablized after the 25th $\lambda$ due to semi-complete separation that fewer candidate variables can be selected, even lambda is decreasing exponentially (will be explained in lasso discarding rule in the ensuing section). See the `glmnet` user manual for the built-in exit mechanism.
+
+
+The result above demonstrated that lasso was not able to complete the selection path, and exited at the 81 out of 100 candidate $\lambda$s. From the scatterplot, it is shown that the number of nonzero effects has stablized after the 25th $\lambda$ due to semi-complete separation that fewer candidate variables can be selected, even lambda is decreasing exponentially (will be explained in lasso discarding rule in the ensuing section). See the `glmnet` user manual for the built-in exit mechanism.
 
 We can also take  a closer look by re-fitting the lasso selected effects in an ordinary logistic regression model, which will explicitly print out the warning message of separation:
 
-```{r, eval=FALSE}
+```{r}
 lambda= cv$lambda.min
 coefs = fit0$beta
 ind = which(cv$lambda==cv$lambda.min)
@@ -440,7 +448,7 @@ $$
 |\mathit{\boldsymbol{x}}_j^T(\mathit{\boldsymbol{y}} - \boldsymbol{p}(\hat{\boldsymbol{\beta}}_{\lambda_{k-1}}))| < 2\lambda - \lambda_{k-1}, \forall j
 $$
 
-where $\hat{\boldsymbol{\beta}}_{\lambda_{k-1}}$ is the nonzero coefficients found by lasso using $\lambda_{k-1}$ at the $k-1$ step. Suppose with $\lambda_{k-1}$, lasso selected a set of variables $\tilde{\boldsymbol{X}}$ that perfectly separate $\mathit{\boldsymbol{y}}$, which lead to $\mathit{\boldsymbol{y}} - \boldsymbol{p}(\hat{\boldsymbol{\beta}}_{\lambda_{k-1}}) \approx 0$. Then, the above discarding rule will have most of the remaining variables discarded. Note that $\mathit{\boldsymbol{y}} - \boldsymbol{p}(\hat{\boldsymbol{\beta}}_{\lambda_{k-1}})$ will not be exactly 0 due to numerical estimations, and as $\lambda$ decreases exponentially, a few variables can still pass the discarding rule (shown from 25th - 78th $\lambda$ in the above example). However, finding a genetic factor/set of factors that perfectly predict the phenotype outcome is unlikely, and it is the case given the simulation setup. With the perfect separation provided by $\tilde{\boldsymbol{X}}$, other true effects cannot be selected into the zon-zero set, resulting in limited PD.
+where $\hat{\boldsymbol{\beta}}_{\lambda_{k-1}}$ is the nonzero coefficients found by lasso using $\lambda_{k-1}$ at the $k-1$ step. Suppose with $\lambda_{k-1}$, lasso selected a set of variables $\tilde{\boldsymbol{X}}$ that perfectly separate $\mathit{\boldsymbol{y}}$, which lead to $\mathit{\boldsymbol{y}} - \boldsymbol{p}(\hat{\boldsymbol{\beta}}_{\lambda_{k-1}}) \approx 0$. Then, the above discarding rule will have most of the remaining variables discarded. Note that $\mathit{\boldsymbol{y}} - \boldsymbol{p}(\hat{\boldsymbol{\beta}}_{\lambda_{k-1}})$ will not be exactly 0 due to numerical estimations, and as $\lambda$ decreases exponentially, a few variables can still pass the discarding rule (shown from 25th - 81st $\lambda$ in the above example). However, finding a genetic factor/set of factors that perfectly predict the phenotype outcome is unlikely, and it is the case given the simulation setup. With the perfect separation provided by $\tilde{\boldsymbol{X}}$, other true effects cannot be selected into the zon-zero set, resulting in limited PD.
 
 EBglmnet doesn't implement such type of discarding rule and is more numerically stable. In the above simulation, EBglmnet can still identify several true effects with reasonable FDR. More simulation results using EBglmnet are available in (Huang et al., 2013) and the EBglmnet Application Note.
 

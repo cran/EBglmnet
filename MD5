@@ -1,4 +1,4 @@
-404126f400c635ae20aa3056f34bbb25 *DESCRIPTION
+0340764f2f486c2dcffb9042d54958be *DESCRIPTION
 d065a6e173f39f3d94a12c2a3654c4c9 *NAMESPACE
 c7492930b8e1d6de2056ccf4910b3202 *R/CVonePair.R
 a965311a7232aa7d7c6c0f6e86488baa *R/EBelasticNet.Binomial.R
@@ -16,11 +16,11 @@ d1e477171bbf857a86b7ff6c3e69a25e *R/EBlassoNEG.Gaussian.R
 761bd1fdc83a6cb1e3318d5dc4d05840 *R/cv.EBglmnet.R
 d8732c5cc290d48a7f4a5805182606c6 *R/ijIndex.R
 cc641e249c542937452495346e6854d3 *R/lambdaMax.R
-ab700ba48430e0003c9670a74cfa0216 *build/vignette.rds
+f3eb42c57bbc0f22339f68f4fdb0f9b8 *build/vignette.rds
 1fa202cac5df93fc0d4c9cf08ca3da96 *data/BASIS.rda
-85e2c58a7086fd7a8044d8dc8592a9bd *inst/doc/EBglmnet_intro.R
-a9a66b1d246b4ee6d378be44ef2516de *inst/doc/EBglmnet_intro.Rmd
-cd0fd4d800cb8556641a07df55cf14b9 *inst/doc/EBglmnet_intro.html
+a5a44181a40afe0aef66ab0518a29e6d *inst/doc/EBglmnet_intro.R
+25e62b0b4c0743dc5efe6dbccd854888 *inst/doc/EBglmnet_intro.Rmd
+e83902f5a1177e3ee1fddca7fd2a352e *inst/doc/EBglmnet_intro.pdf
 1f05adaac90fe429809f048cfea736e0 *man/BASIS.Rd
 05a8f4f4177e14c1f836702fef2b153e *man/EBglmnet-internal.Rd
 12192c90050ffd60ccac28b84e27741c *man/EBglmnet-package.Rd
@@ -41,5 +41,5 @@ c69de1aa3bbc664d6ce99c5e74c7e5ec *src/elasticNet.h
 5e92f643958f934a51b949dbed067dbb *src/fEBBinaryNEG.c
 b6c4a00722f588158c78d273e323f414 *src/fEBLinearNEG.c
 7c22b1b500cab25872924e218f1645f5 *src/registerDynamicSymbol.c
-a9a66b1d246b4ee6d378be44ef2516de *vignettes/EBglmnet_intro.Rmd
+25e62b0b4c0743dc5efe6dbccd854888 *vignettes/EBglmnet_intro.Rmd
 e7367b3ddbd81a19f366e481271641a3 *vignettes/priors.jpg
