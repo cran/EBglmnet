@@ -270,10 +270,10 @@ output$residual
  
 If there are two possible outcomes in the response variable, a binomial distribution assumption on `y` is available in `EBglmnet`, which has $\mathit{p}(\mathit{\boldsymbol{y}}|\mu, \boldsymbol{\beta}, \varphi)$ following a binomial distribution and $\varphi\in\emptyset$. Same as the widely-used logistic regression model, the link function is $\eta_i = logit(p_i)=\log(\frac{Pr(y_i)=1}{1-Pr(y_i=1)}), i = 1, \dots, n$. To run `EBglmnet` with binomial models, users need to specify the parameter `family` as `binomial`:
 ```{r, eval=FALSE}
-yy = y>mean(y);
-output = EBglmnet(x,yy,family="binomial", hyperparameters = c(0.1, 0.1))
+yBinary = y>mean(y);
+output = EBglmnet(x,yBinary,family="binomial", hyperparameters = c(0.1, 0.1))
 ```
-For illustration purpose, the above codes created a binary variable `yy` by set the cutoff at the mean Life Expectancy value. 
+For illustration purpose, the above codes created a binary variable `yBinary` by set the cutoff at the mean Life Expectancy value. 
 
 [Back to Top](#top)
 
@@ -283,7 +283,7 @@ For illustration purpose, the above codes created a binary variable `yy` by set 
 
 The three sets of hierarchical prior distribution can be specified by `prior` option in `EBglmnet`. By default, `EBglmnet` assumes the `lassoNEG` prior. The following example changes the prior via `prior` parameter:
 ```{r, eval=FALSE}
-output = EBglmnet(x,yy,family="binomial", prior = "elastic net", hyperparameters = c(0.1, 0.1))
+output = EBglmnet(x,yBinary,family="binomial", prior = "elastic net", hyperparameters = c(0.1, 0.1))
 output$fit
 ```
 Note that the hyperparameters setup is associated with a specific prior. In `lasso` prior, only one hyperparameter $\lambda$ is required, while in `elastic net` and `lassoNEG`, two hyperparameters need to be specified. For `EBEN` having the `elastic net` prior distribution, the two hyperparameters $\lambda_1$ and $\lambda_2$ are defined in terms of other two parameters $\alpha \in [0,1]$ and $\lambda>0$ same as in `glmnet` package, such that $\lambda_1 = (1-\alpha)\lambda$ and  $\lambda_2 = \alpha\lambda$. Therefore, users are asked to specify $hyperparameters=c(\alpha, \lambda)$. 

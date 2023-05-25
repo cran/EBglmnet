@@ -45,7 +45,7 @@ void elasticNetLinear(double *BASIS, double *y, double *a_lambda, double *b_Alph
 	
 	int basisMax			= 1e7/M_full;
 	if (basisMax>M_full)	basisMax = M_full;
-	if(verbose>0) Rprintf("basisMax: %d",basisMax);
+	if(verbose>2) Rprintf("basisMax: %d \n",basisMax);
 	if(verbose >1) Rprintf("start EB-elasticNet with alpha: %f, lambda: %f\n",*b_Alpha, *a_lambda);
 	double vk				= 1e-30;
 	double vk0				= 1e-30;
@@ -96,7 +96,7 @@ void elasticNetLinear(double *BASIS, double *y, double *a_lambda, double *b_Alph
 	iteration				= (int* ) Calloc(1, int);
 	m						= (int* ) Calloc(1, int);
 	C_inv					= (double * ) Calloc(N*N, double);
-	if(verbose>0) Rprintf("outer loop starts");
+	if(verbose>3) Rprintf("outer loop starts \n");
 	m[0]			= 1;
 	int M					= m[0];	
 	//Fixed Effect
@@ -149,7 +149,7 @@ void elasticNetLinear(double *BASIS, double *y, double *a_lambda, double *b_Alph
 
 	wald[0]					= 0;
 	int index = 0;
-	if(verbose >1) Rprintf("EBLASSO Finished, number of basis: %d\n",M);
+	if(verbose >1) Rprintf("EBglmnet Finished, number of basis: %d\n",M);
 	for(i=0;i<M;i++)
     {
 

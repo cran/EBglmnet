@@ -2,7 +2,7 @@ Package: EBglmnet
 Type: Package
 Title: Empirical Bayesian Lasso and Elastic Net Methods for Generalized
         Linear Models
-Version: 5.3
+Version: 6.0
 Date: 2023-05-12
 Author: Anhui Huang, Dianting Liu
 Maintainer: Anhui Huang <anhuihuang@gmail.com>
@@ -13,6 +13,6 @@ VignetteBuilder: knitr
 URL: https://sites.google.com/site/anhuihng/
 NeedsCompilation: yes
 Repository: CRAN
-Packaged: 2023-05-13 02:55:34 UTC; anhui
+Packaged: 2023-05-25 02:22:49 UTC; anhui
 Depends: R (>= 2.10)
-Date/Publication: 2023-05-13 06:20:06 UTC
+Date/Publication: 2023-05-25 03:30:02 UTC

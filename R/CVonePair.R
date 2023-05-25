@@ -18,7 +18,7 @@ CVonePair <-function(X,y,nFolds,foldId,hyperpara=c(1,0.1),
 	{
 		model = 1;
 	}
-  if(verbose>0) cat("Empirical Bayes Lasso/Elastic Net Logistic Model: ", nFolds, "fold cross-validation\n");
+  if(verbose>=1) cat("Empirical Bayes Lasso/Elastic Net Logistic Model: ", nFolds, "fold cross-validation on (",hyperpara, ")\n");
 	N = nrow(X);
 	K = ncol(X);
 	group = 0;

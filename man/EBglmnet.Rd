@@ -15,22 +15,25 @@ EBglmnet(x, y, family=c("gaussian","binomial"),prior= c("lassoNEG","lasso","elas
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{x}{input matrix of dimension \code{n} x \code{p}; each row is an
-  observation vector, and each column is a variable. When epistasis is considered, users do not need
-  to create a giant matrix including both main and interaction terms. Instead, \code{x} should always be
-  the matrix corresponding to the \code{p} main effects, and \code{EBglmnet} will generate the interaction terms
-  dynamically during running time.}
+  observation vector, and each column is a variable. 
+  }
+  
   \item{y}{response variable. Continuous for \code{family="gaussian"}, and binary for 
   \code{family="binomial"}. For binary response variable, y can be a Boolean or numeric vector, or factor type
   array.}
+  
   \item{family}{model type taking values of "gaussian" (default) or "binomial". } 
+  
   \item{prior}{prior distribution to be used. It takes values of "lassoNEG"(default), "lasso", and "elastic net". 
   All priors will produce a sparse outcome of the regression coefficients; see Details for choosing priors. }  
+  
   \item{hyperparameters}{the optimal hyperparameters in the prior distribution. Similar as \eqn{\lambda} in lasso
   method, the hyperparameters control the number of nonzero elements in the regression coefficients. Hyperparameters 
   are most oftenly determined by CV. See \code{cv.EBglmnet} for the method in determining their values. 
   While \code{cv.EBglmnet} already provides the model fitting results using the hyperparameters determined in CV,
   users can use this function to obtain the results under other parameter selection criteria such as Akaike information criterion
   (AIC) or Bayesian information criterion (BIC). } 
+  
   \item{verbose}{parameter that controls the level of message output from EBglment. It takes values from 0 to 5; larger verbose displays more messages. small values are recommended to avoid excessive outputs. Default value for \code{verbose} is minimum message output.}
 }
 \details{EBglmnet implements three set of hierarchical prior distributions for the regression parameters \eqn{\beta}: \cr\cr
@@ -86,6 +89,7 @@ and \eqn{\lambda (\lambda >0)}.  Therefore, users are asked to specify \code{hyp
 	column4: t-value calculated using column 3-4. \cr\cr
 	column5: p-value from t-test.	
 	}
+	
 	\item{WaldScore}{the Wald Score for the posterior distribution. It is computed as \eqn{\beta^T\Sigma^{-1}\beta}. 
 	See (Huang A, 2014b) for using Wald Score to identify significant effect set.}
 	\item{Intercept}{the intercept in the linear regression model. This parameter is not shrunk.}
@@ -102,7 +106,7 @@ and \eqn{\lambda (\lambda >0)}.  Therefore, users are asked to specify \code{hyp
 	Huang A, Xu S, Cai X. (2013). Empirical Bayesian LASSO-logistic regression for multiple binary trait locus mapping. BMC genetics  14(1):5. \cr\cr
 	Huang, A., Xu, S., and Cai, X. (2014a). Empirical Bayesian elastic net for multiple quantitative trait locus mapping. Heredity 10.1038/hdy.2014.79 \cr 
 }
-\author{Anhui Huang and Dianting Liu \cr Dept of Electrical and Computer Engineering, Univ of Miami, Coral Gables, FL}
+\author{Anhui Huang and Dianting Liu \cr }
 
 
 

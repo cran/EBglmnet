@@ -37,7 +37,7 @@ void fEBBinaryMainEff(double *BASIS, double * Targets, double *a_gamma, double *
 	if(verbose >1) Rprintf("start EBLasso-NEG with a: %f, \tb: %f\n",a_gamma[0], b_gamma[0]);
 	int basisMax			= 1e6/N;
 	if (basisMax>M_full)	basisMax = M_full;
-	if(verbose >1) Rprintf("M_full: %d; basisMax: %d\n",M_full,basisMax);
+	if(verbose >2) Rprintf("M_full: %d; basisMax: %d\n",M_full,basisMax);
 	double vk				= 1e-30;
 	double vk0				= 1e-30;
 	double temp				= 0;

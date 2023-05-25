@@ -10,7 +10,7 @@ the number of samples in the regression model, and inferring a sparse solution s
 will have exactly zero value on their regression coefficients. Additionally, there are several unique features in \pkg{EBglmnet}: \cr\cr
 1) Both \code{EBlasso} and \code{EBEN} can select more than \code{n} nonzero effects. \cr
 2) EBglmnet also performs hypothesis testing for the significance of nonzero estimates. \cr
-3) EBglmnet includes built-in functions for epistasis analysis.\cr\cr
+\cr
 			 There are three sets of hierarchical prior distributions implemented in \pkg{EBglmnet}: \cr\cr
 1) EBlasso-NE is a two-level prior with (normal + exponential) distributions for the regression coefficients.\cr
 2) EBlasso-NEG is a three-level hierarchical prior with (normal + exponential + gamma) distributions.\cr
@@ -33,12 +33,17 @@ Several simulation and real data analysis in the reference papers demonstrated t
 			3. group EBlasso: (Huang A., Martin E., et al. 2014) \cr
 			4. EBEN: (Huang A., Xu S., and Cai X., 2015)\cr
 			5. Whole-genome QTL mapping: (Huang A., Xu S., and Cai X., 2014) \cr
+			
+EBglmnet version after V5 will not support the following. For those functionalities, please refer to the `cran` package `EBEN`. 
+- Two way interaction (epistasis) will not be supported;
+- Group EBlasso will not be supported.
+
 }
 \details{
 \tabular{ll}{
 Package: \tab EBglmnet\cr
 Type: \tab Package\cr
-Version: \tab 4.1\cr
+Version: \tab 6.0\cr
 Date: \tab 2016-01-15\cr
 License: \tab gpl\cr
 }
